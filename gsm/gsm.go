@@ -36,7 +36,7 @@ packages: ["goki.dev/{{.Name}}"]
 //gti:add
 func NewVanity(c *Config) error {
 	b := bytes.Buffer{}
-	err := newVanityTmpl.Execute(&b, newVanityTmplData{Name: c.Repository, Title: strcase.ToKebab(c.Repository)})
+	err := newVanityTmpl.Execute(&b, newVanityTmplData{Name: c.Repository, Title: strcase.ToCamel(c.Repository)})
 	if err != nil {
 		return fmt.Errorf("programmer error: error executing vanity URL file template: %w", err)
 	}
