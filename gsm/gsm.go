@@ -21,11 +21,11 @@ import (
 //gti:add
 func NewVanity(c *Config) error {
 	data := fmt.Sprintf(`---
-	title: %s
-	repo: "https://github.com/goki/%s"
-	packages: ["goki.dev/%s"]
-	---
-	`, strcase.ToCamel(c.Repository), c.Repository, c.Repository)
+title: %s
+repo: "https://github.com/goki/%s"
+packages: ["goki.dev/%s"]
+---
+`, strcase.ToCamel(c.Repository), c.Repository, c.Repository)
 	dir := filepath.Join("content", "en", c.Repository)
 	err := os.MkdirAll(dir, 0770)
 	if err != nil {
