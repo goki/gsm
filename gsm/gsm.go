@@ -6,13 +6,28 @@
 package gsm
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
+	"text/template"
 
 	"github.com/iancoleman/strcase"
 	"goki.dev/xe"
 )
+
+type newVanityTmplData struct {
+	Name  string
+	Title string
+}
+
+var newVanityTmpl = template.Must(template.New("newVanity").Parse(
+	`---
+title: {{.Title}}
+repo: "https://github.com/goki/{{.Name}}"
+packages: ["goki.dev/{{.Name}}"]
+---
+`))
 
 // NewVanity makes a new vanity import URL page for the config
 // repository name. It should only be called in the root directory
@@ -20,21 +35,20 @@ import (
 //
 //gti:add
 func NewVanity(c *Config) error {
-	data := fmt.Sprintf(`---
-title: %s
-repo: "https://github.com/goki/%s"
-packages: ["goki.dev/%s"]
----
-`, strcase.ToCamel(c.Repository), c.Repository, c.Repository)
-	dir := filepath.Join("content", "en", c.Repository)
-	err := os.MkdirAll(dir, 0770)
+	b := bytes.Buffer{}
+	err := newVanityTmpl.Execute(&b, newVanityTmplData{Name: c.Repository, Title: strcase.ToKebab(c.Repository)})
 	if err != nil {
-		return fmt.Errorf("error making repository directory: %w", err)
+		return fmt.Errorf("programmer error: error executing vanity URL file template: %w", err)
+	}
+	dir := filepath.Join("content", "en", c.Repository)
+	err = os.MkdirAll(dir, 0770)
+	if err != nil {
+		return fmt.Errorf("error making vanity URL directory: %w", err)
 	}
 	fname := filepath.Join(dir, "_index.md")
-	err = os.WriteFile(fname, []byte(data), 0666)
+	err = os.WriteFile(fname, b.Bytes(), 0666)
 	if err != nil {
-		return fmt.Errorf("error writing to _index.md file for repository: %w", err)
+		return fmt.Errorf("error writing to _index.md file for vanity URL: %w", err)
 	}
 	xc := xe.DefaultConfig()
 	xc.Fatal = false
