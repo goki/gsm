@@ -5,7 +5,14 @@
 // Package gsm provides functions for maintaining the source code of GoKi itself (GoKi Source Management)
 package gsm
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/iancoleman/strcase"
+	"goki.dev/xe"
+)
 
 // NewVanity makes a new vanity import URL page for the config
 // repository name. It should only be called in the root directory
@@ -13,6 +20,25 @@ import "fmt"
 //
 //gti:add
 func NewVanity(c *Config) error {
-	fmt.Println("making new vanity for", c.Package)
+	data := fmt.Sprintf(`---
+	title: %s
+	repo: "https://github.com/goki/%s"
+	packages: ["goki.dev/%s"]
+	---
+	`, strcase.ToCamel(c.Repository), c.Repository, c.Repository)
+	dir := filepath.Join("content", "en", c.Repository)
+	err := os.MkdirAll(dir, 0770)
+	if err != nil {
+		return fmt.Errorf("error making repository directory: %w", err)
+	}
+	fname := filepath.Join(dir, "_index.md")
+	err = os.WriteFile(fname, []byte(data), 0666)
+	if err != nil {
+		return fmt.Errorf("error writing to _index.md file for repository: %w", err)
+	}
+	err = xe.Run(xe.DefaultConfig(), "git", "add", fname)
+	if err != nil {
+		return fmt.Errorf("error adding to git: %w", err)
+	}
 	return nil
 }

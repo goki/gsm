@@ -7,6 +7,6 @@ package gsm
 // Config contains the configuration information for the GSM tool
 type Config struct {
 
-	// the name of the package to create a vanity import site for
-	Package string `cmd:"new-vanity" posarg:"0" desc:"the name of the package to create a vanity import site for"`
+	// the name of the repository to create a vanity import site for
+	Repository string `cmd:"new-vanity" posarg:"0" desc:"the name of the repository to create a vanity import site for"`
 }
