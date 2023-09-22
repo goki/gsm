@@ -5,21 +5,39 @@
 package gsm
 
 import (
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+
 	"golang.org/x/tools/go/packages"
 )
 
-// ParsePackages parses all of the packages in the current
-// directory (assumed to be the GoKi root directory).
+// ParsePackages parses all of the root packages in the modules
+// in the current directory (assumed to be the GoKi root directory).
 func ParsePackages() ([]*packages.Package, error) {
+	res := []*packages.Package{}
 	pcfg := &packages.Config{
 		Mode:  PackageModes(),
 		Tests: false,
 	}
-	pkgs, err := packages.Load(pcfg, "./...")
-	if err != nil {
-		return nil, err
-	}
-	return pkgs, err
+	err := fs.WalkDir(os.DirFS("."), ".", func(path string, d fs.DirEntry, perr error) error {
+		if d.Name() != "go.mod" {
+			return nil
+		}
+		dir := filepath.Dir(path)
+		err := os.Chdir(dir)
+		if err != nil {
+			return fmt.Errorf("error changing to module directory %q: %w", dir, err)
+		}
+		pkgs, err := packages.Load(pcfg, ".")
+		if err != nil {
+			return fmt.Errorf("error loading package %q: %w", dir, err)
+		}
+		res = append(res, pkgs...)
+		return nil
+	})
+	return res, err
 }
 
 // PackageModes returns the package load modes needed for gsm.
