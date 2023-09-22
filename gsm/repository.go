@@ -64,7 +64,7 @@ func GetLocalRepositories() ([]*Repository, error) {
 			if !strings.HasPrefix(mod.Module.Mod.Path, "goki.dev") {
 				return
 			}
-			nm := path.Base(mod.Module.Mod.Path)
+			nm := path.Base(path.Dir(dpath)) // can't use mod path because of major version suffixes; easier to just use this
 			rep := &Repository{
 				Name:          nm,
 				Title:         strcase.ToCamel(nm),
