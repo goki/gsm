@@ -31,7 +31,7 @@ func Release(c *Config) error {
 
 		ec := xe.ErrorConfig()
 		ec.Dir = rep.Name
-		tag, err := xe.Output(ec, "git", "describe")
+		tag, err := xe.Output(ec, "git", "describe", "--abbrev=0")
 		if err != nil {
 			return fmt.Errorf("error getting latest tag for repository %q: %w", rep.Name, err)
 		}
@@ -43,7 +43,13 @@ func Release(c *Config) error {
 		if diff == "" { // unchanged, so no release needed
 			continue
 		}
-		fmt.Println(rep.Name, "changed")
+
+		if len(rep.GoKiImports) == 0 { // if we have no GoKi imports, we can release right now
+			err := xe.Run(vc, "goki", "set-version", tag)
+			if err != nil {
+				return fmt.Errorf("error getting setting version of repo %q to %q: %w", rep.Name, tag, err)
+			}
+		}
 	}
 	return nil
 }
