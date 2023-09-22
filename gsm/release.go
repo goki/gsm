@@ -22,12 +22,28 @@ func Release(c *Config) error {
 		return fmt.Errorf("error parsing packages: %w", err)
 	}
 	for _, rep := range reps {
-		xc := xe.VerboseConfig()
-		xc.Dir = rep.Name
-		err := xe.Run(xc, "go", "get", "-u", "./...")
+		vc := xe.VerboseConfig()
+		vc.Dir = rep.Name
+		err := xe.Run(vc, "go", "get", "-u", "./...")
 		if err != nil {
 			return fmt.Errorf("error updating deps for repository %q: %w", rep.Name, err)
 		}
+
+		ec := xe.ErrorConfig()
+		ec.Dir = rep.Name
+		tag, err := xe.Output(ec, "git", "describe")
+		if err != nil {
+			return fmt.Errorf("error getting latest tag for repository %q: %w", rep.Name, err)
+		}
+
+		diff, err := xe.Output(ec, "git", "diff", tag)
+		if err != nil {
+			return fmt.Errorf("error getting diff from latest tag %q for repository %q: %w", tag, rep.Name, err)
+		}
+		if diff == "" { // unchanged, so no release needed
+			continue
+		}
+		fmt.Println(rep.Name, "changed")
 	}
 	return nil
 }
