@@ -7,11 +7,40 @@ package gsm
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"path"
 
+	"goki.dev/xe"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
+
+// Clone clones all of the GoKi Go repositories into the current directory.
+// It does not clone repositories that the user already has in the current directory.
+//
+//gti:add
+func Clone(c *Config) error {
+	reps, err := GetRepositories()
+	if err != nil {
+		return fmt.Errorf("error getting repositories: %w", err)
+	}
+	for _, rep := range reps {
+		fi, err := os.Stat(rep.Name)
+		if err == nil && fi.IsDir() { // if we already have dir, we don't need to clone
+			continue
+		}
+		if !fi.IsDir() {
+			return fmt.Errorf("file %q (for repository %q) already exists and is not a directory", rep.Name, rep.Title)
+		}
+		xc := xe.DefaultConfig()
+		xc.Fatal = false
+		err = xe.Run(xc, "git", "clone", rep.RepositoryURL)
+		if err != nil {
+			return fmt.Errorf("error cloning repository: %w", err)
+		}
+	}
+	return nil
+}
 
 // Repository represents a GoKi Go repository
 type Repository struct {
@@ -109,19 +138,4 @@ func appendAll(dst []*html.Node, n *html.Node, mf matchFunc) []*html.Node {
 		dst = appendAll(dst, c, mf)
 	}
 	return dst
-}
-
-// Clone clones all of the GoKi Go repositories into the current directory.
-// It does not clone repositories that the user already has in the current directory.
-//
-//gti:add
-func Clone(c *Config) error {
-	reps, err := GetRepositories()
-	if err != nil {
-		return fmt.Errorf("error getting repositories: %w", err)
-	}
-	for _, rep := range reps {
-		fmt.Println(rep)
-	}
-	return nil
 }
