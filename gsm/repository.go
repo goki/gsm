@@ -51,6 +51,7 @@ func Clone(c *Config) error {
 			}
 		}()
 	}
+	wg.Wait()
 	return errors.Join(errs...)
 }
 
