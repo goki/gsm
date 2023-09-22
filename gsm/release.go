@@ -4,7 +4,11 @@
 
 package gsm
 
-import "fmt"
+import (
+	"fmt"
+
+	"goki.dev/xe"
+)
 
 // Release releases all of the GoKi Go repositories in the current folder with goki.dev
 // vanity import URLs (those without vanity import URLs should be released separately),
@@ -18,7 +22,12 @@ func Release(c *Config) error {
 		return fmt.Errorf("error parsing packages: %w", err)
 	}
 	for _, rep := range reps {
-		fmt.Println(rep)
+		xc := xe.VerboseConfig()
+		xc.Dir = rep.Name
+		err := xe.Run(xc, "go", "get", "-u", "./...")
+		if err != nil {
+			return fmt.Errorf("error updating deps for repository %q: %w", rep.Name, err)
+		}
 	}
 	return nil
 }
