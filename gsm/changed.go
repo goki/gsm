@@ -5,31 +5,43 @@
 package gsm
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"sync"
 
+	"goki.dev/grease"
 	"goki.dev/xe"
 )
 
-// Changed prints all of the repositories that have been changed
+// Changed concurrently prints all of the repositories that have been changed
 // and need to be updated in version control.
 //
 //gti:add
 func Changed(c *Config) error {
-	return fs.WalkDir(os.DirFS("."), ".", func(path string, d fs.DirEntry, perr error) error {
-		if d.Name() != ".git" {
-			return nil
-		}
-		dir := filepath.Dir(path)
-		out, err := xe.Output(xe.ErrorConfig(), "git", "-C", dir, "diff")
-		if err != nil {
-			return fmt.Errorf("error getting diff of %q: %w", dir, err)
-		}
-		if out != "" { // if we have a diff, we are changed
-			fmt.Println(dir)
-		}
+	wg := sync.WaitGroup{}
+	errs := []error{}
+	fs.WalkDir(os.DirFS("."), ".", func(path string, d fs.DirEntry, err error) error {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if d.Name() != ".git" {
+				return
+			}
+			dir := filepath.Dir(path)
+			out, err := xe.Output(xe.ErrorConfig(), "git", "-C", dir, "diff")
+			if err != nil {
+				errs = append(errs, fmt.Errorf("error getting diff of %q: %w", dir, err))
+			}
+			if out != "" { // if we have a diff, we have been changed
+				fmt.Println(grease.CmdColor(dir))
+			}
+		}()
 		return nil
 	})
+	wg.Wait()
+	fmt.Println("")
+	return errors.Join(errs...)
 }
