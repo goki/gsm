@@ -5,9 +5,14 @@
 package gsm
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"net/http"
+	"os"
 	"path"
+	"path/filepath"
+	"sync"
 
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -23,11 +28,39 @@ type Repository struct {
 	RepositoryURL string
 	// The goki.dev vanity import URL of the repository (not including https://)
 	VanityURL string
+	// The imports of the repository
+	Imports []string
 }
 
-// GetRepositories gets all of the GoKi Go repositories as [Repository]
+// GetLocalRepositories concurrently gets all of the GoKi Go
+// repositories in the current directory on the local filesystem.
+func GetLocalRepositories() ([]*Repository, error) {
+	wg := sync.WaitGroup{}
+	errs := []error{}
+	res := []*Repository{}
+	fs.WalkDir(os.DirFS("."), ".", func(path string, d fs.DirEntry, err error) error {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if d.Name() != "go.mod" {
+				return
+			}
+			dir := filepath.Dir(path)
+			mod, err := os.ReadFile(path)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("error reading mod file for %q: %w", dir, err))
+			}
+			fmt.Println(string(mod))
+		}()
+		return nil
+	})
+	wg.Wait()
+	return res, errors.Join(errs...)
+}
+
+// GetWebsiteRepositories gets all of the GoKi Go repositories as [Repository]
 // objects from the https://goki.dev/repositories page.
-func GetRepositories() ([]*Repository, error) {
+func GetWebsiteRepositories() ([]*Repository, error) {
 	resp, err := http.Get("https://goki.dev/repositories")
 	if err != nil {
 		return nil, fmt.Errorf("error getting goki.dev/repositories page: %w", err)

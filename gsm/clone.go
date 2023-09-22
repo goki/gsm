@@ -18,7 +18,7 @@ import (
 //
 //gti:add
 func Clone(c *Config) error {
-	reps, err := GetRepositories()
+	reps, err := GetWebsiteRepositories()
 	if err != nil {
 		return fmt.Errorf("error getting repositories: %w", err)
 	}

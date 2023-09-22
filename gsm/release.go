@@ -12,14 +12,10 @@ import "fmt"
 //
 //gti:add
 func Release(c *Config) error {
-	pkgs, err := ParsePackages()
+	reps, err := GetLocalRepositories()
 	if err != nil {
 		return fmt.Errorf("error parsing packages: %w", err)
 	}
-	for _, pkg := range pkgs {
-		if pkg.Module != nil {
-			fmt.Println(pkg.Module.Path, pkg.Imports)
-		}
-	}
+	fmt.Println(reps)
 	return nil
 }
