@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// Package gsm provides functions for maintaining the source code of GoKi itself (GoKi Source Management)
 package gsm
 
 // Config contains the configuration information for the GSM tool
