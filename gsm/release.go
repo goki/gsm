@@ -16,6 +16,8 @@ func Release(c *Config) error {
 	if err != nil {
 		return fmt.Errorf("error parsing packages: %w", err)
 	}
-	fmt.Println(reps)
+	for _, rep := range reps {
+		fmt.Println(rep)
+	}
 	return nil
 }

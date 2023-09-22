@@ -12,8 +12,10 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"sync"
 
+	"github.com/iancoleman/strcase"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -29,35 +31,54 @@ type Repository struct {
 	RepositoryURL string
 	// The goki.dev vanity import URL of the repository (not including https://)
 	VanityURL string
-	// The imports of the repository
-	Imports []string
+	// The GoKi imports of the repository
+	GoKiImports []string
 }
 
 // GetLocalRepositories concurrently gets all of the GoKi Go
-// repositories in the current directory on the local filesystem.
+// repositories with goki.dev vanity import URLs in the current
+// directory on the local filesystem.
 func GetLocalRepositories() ([]*Repository, error) {
 	wg := sync.WaitGroup{}
 	errs := []error{}
 	res := []*Repository{}
-	fs.WalkDir(os.DirFS("."), ".", func(path string, d fs.DirEntry, err error) error {
+	fs.WalkDir(os.DirFS("."), ".", func(dpath string, d fs.DirEntry, err error) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			if d.Name() != "go.mod" {
 				return
 			}
-			dir := filepath.Dir(path)
-			b, err := os.ReadFile(path)
+			dir := filepath.Dir(dpath)
+			b, err := os.ReadFile(dpath)
 			if err != nil {
 				errs = append(errs, fmt.Errorf("error reading mod file for %q: %w", dir, err))
 				return
 			}
-			mod, err := modfile.Parse(path, b, nil)
+			mod, err := modfile.Parse(dpath, b, nil)
 			if err != nil {
 				errs = append(errs, fmt.Errorf("error parsing mod file for %q: %w", dir, err))
 				return
 			}
-			fmt.Println(mod.Module)
+			// we only care about repositories with goki.dev vanity import URLs
+			if !strings.HasPrefix(mod.Module.Mod.Path, "goki.dev") {
+				return
+			}
+			nm := path.Base(mod.Module.Mod.Path)
+			rep := &Repository{
+				Name:          nm,
+				Title:         strcase.ToCamel(nm),
+				RepositoryURL: "https://github.com/goki/" + nm,
+				VanityURL:     mod.Module.Mod.Path,
+			}
+			for _, req := range mod.Require {
+				// we only care about dependencies with goki.dev vanity import URLs
+				if !strings.HasPrefix(req.Mod.Path, "goki.dev") {
+					continue
+				}
+				rep.GoKiImports = append(rep.GoKiImports, req.Mod.Path)
+			}
+			res = append(res, rep)
 		}()
 		return nil
 	})
