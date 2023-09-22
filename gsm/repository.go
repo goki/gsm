@@ -15,13 +15,15 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/iancoleman/strcase"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
-// Repository represents a GoKi Go repository
+// Repository represents a GoKi Go repository. Not all fields
+// are used by all use cases.
 type Repository struct {
 	// The actual GitHub name of the repository
 	Name string
@@ -33,6 +35,10 @@ type Repository struct {
 	VanityURL string
 	// The GoKi imports of the repository
 	GoKiImports []string
+	// Whether the repository has changed since the last release
+	Changed bool
+	// The version of the repository
+	Version *semver.Version
 }
 
 // GetLocalRepositories concurrently gets all of the GoKi Go

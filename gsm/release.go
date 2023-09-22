@@ -7,6 +7,7 @@ package gsm
 import (
 	"fmt"
 
+	"github.com/Masterminds/semver/v3"
 	"goki.dev/xe"
 )
 
@@ -40,16 +41,43 @@ func Release(c *Config) error {
 		if err != nil {
 			return fmt.Errorf("error getting diff from latest tag %q for repository %q: %w", tag, rep.Name, err)
 		}
-		if diff == "" { // unchanged, so no release needed
+		rep.Changed = diff != ""
+		if !rep.Changed { // unchanged, so no release needed
 			continue
 		}
 
+		ver, err := semver.NewVersion(tag)
+		if err != nil {
+			return fmt.Errorf("error getting semver version of repository %q from tag %q: %w", rep.Name, tag, err)
+		}
+		rep.Version = ver
+
 		if len(rep.GoKiImports) == 0 { // if we have no GoKi imports, we can release right now
-			err := xe.Run(vc, "goki", "set-version", tag)
+			err := ReleaseRepository(rep)
 			if err != nil {
-				return fmt.Errorf("error getting setting version of repo %q to %q: %w", rep.Name, tag, err)
+				return err
 			}
 		}
+	}
+	return nil
+}
+
+// ReleaseRepository releases the given repository by incrementing its
+// patch version and calling "goki set-version" and "goki release".
+func ReleaseRepository(rep *Repository) error {
+	vc := xe.VerboseConfig()
+	vc.Dir = rep.Name
+
+	*rep.Version = rep.Version.IncPatch()
+
+	nver := "v" + rep.Version.String()
+	err := xe.Run(vc, "goki", "set-version", nver)
+	if err != nil {
+		return fmt.Errorf("error getting setting version of repository %q to %q: %w", rep.Name, nver, err)
+	}
+	err = xe.Run(vc, "goki", "release")
+	if err != nil {
+		return fmt.Errorf("error releasing repository %q with version %q: %w", rep.Name, nver, err)
 	}
 	return nil
 }
