@@ -29,9 +29,7 @@ func Pull(c *Config) error {
 				return
 			}
 			dir := filepath.Dir(path)
-			xc := xe.DefaultConfig()
-			xc.Fatal = false
-			err := xe.Run(xc, "git", "-C", dir, "pull")
+			err := xe.Run(xe.VerboseConfig(), "git", "-C", dir, "pull")
 			if err != nil {
 				errs = append(errs, fmt.Errorf("error pulling %q: %w", dir, err))
 			}
