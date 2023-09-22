@@ -7,8 +7,10 @@ package gsm
 import (
 	"fmt"
 	"net/http"
+	"path"
 
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
 // Repository represents a GoKi Go repository
@@ -17,9 +19,9 @@ type Repository struct {
 	Name string
 	// The formatted title of the repository
 	Title string
-	// The URL of the GitHub repository
+	// The URL of the GitHub repository (including https://)
 	RepositoryURL string
-	// The https://goki.dev vanity import URL of the repository
+	// The goki.dev vanity import URL of the repository (not including https://)
 	VanityURL string
 }
 
@@ -38,8 +40,75 @@ func GetRepositories() ([]*Repository, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error parsing HTML from repositories page: %w", err)
 	}
-	fmt.Println(tree)
-	return nil, nil
+	reps, err := extractRepositories(tree)
+	if err != nil {
+		return nil, fmt.Errorf("error extracting repositories from HTML: %w", err)
+	}
+	return reps, nil
+}
+
+// extractRepositories extracts repositories from the given HTML node
+// that should be the root node of the https://goki.dev/repositories page.
+func extractRepositories(node *html.Node) ([]*Repository, error) {
+	nodes := appendAll(nil, node, func(n *html.Node) bool {
+		if n.DataAtom != atom.Div {
+			return false
+		}
+		for _, a := range n.Attr {
+			if a.Key == "class" && a.Val == "entry" {
+				return true
+			}
+		}
+		return false
+	})
+	res := []*Repository{}
+	for _, n := range nodes {
+		// structure:
+		// <div class=entry>
+		// 		<h5>
+		// 			<a href="/name/">Title></a>
+		//		</h5>
+		// </div>
+		if n.FirstChild == nil || n.FirstChild.FirstChild == nil {
+			return nil, fmt.Errorf("got nil first child or first child's child for entry div node %#v", n)
+		}
+		a := n.FirstChild.FirstChild
+		href := ""
+		for _, attr := range a.Attr {
+			if attr.Key == "href" {
+				href = attr.Val
+			}
+		}
+		if href == "" {
+			return nil, fmt.Errorf("could not get href for node %#v", a)
+		}
+		if a.FirstChild.Type != html.TextNode {
+			return nil, fmt.Errorf("expected text node as first child of node %#v", a)
+		}
+		rep := &Repository{
+			Name:  path.Base(href),
+			Title: a.FirstChild.Data,
+		}
+		rep.RepositoryURL = path.Join("https://github.com/goki/" + rep.Name)
+		rep.VanityURL = path.Join("goki.dev/" + rep.Name)
+		res = append(res, rep)
+	}
+	return res, nil
+}
+
+// matchFunc matches HTML nodes.
+type matchFunc func(*html.Node) bool
+
+// appendAll recursively traverses the parse tree rooted under the provided
+// node and appends all nodes matched by the matchFunc to dst.
+func appendAll(dst []*html.Node, n *html.Node, mf matchFunc) []*html.Node {
+	if mf(n) {
+		dst = append(dst, n)
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		dst = appendAll(dst, c, mf)
+	}
+	return dst
 }
 
 // Clone clones all of the GoKi Go repositories into the current directory.
@@ -51,6 +120,8 @@ func Clone(c *Config) error {
 	if err != nil {
 		return fmt.Errorf("error getting repositories: %w", err)
 	}
-	fmt.Println(reps)
+	for _, rep := range reps {
+		fmt.Println(rep)
+	}
 	return nil
 }
