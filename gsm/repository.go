@@ -5,10 +5,12 @@
 package gsm
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"path"
+	"sync"
 
 	"goki.dev/xe"
 	"golang.org/x/net/html"
@@ -18,29 +20,41 @@ import (
 // Clone clones all of the GoKi Go repositories into the current directory.
 // It does not clone repositories that the user already has in the current directory.
 //
+// It runs concurrently across multiple goroutines, meaning it should only take
+// the time it takes to clone one repository.
+//
 //gti:add
 func Clone(c *Config) error {
 	reps, err := GetRepositories()
 	if err != nil {
 		return fmt.Errorf("error getting repositories: %w", err)
 	}
+	wg := sync.WaitGroup{}
+	wg.Add(len(reps))
+	var errs []error
 	for _, rep := range reps {
-		fi, err := os.Stat(rep.Name)
-		if err == nil { // no error means it already exists
-			if fi.IsDir() { // if we already have dir, we don't need to clone
-				continue
-			} else {
-				return fmt.Errorf("file %q (for repository %q) already exists and is not a directory", rep.Name, rep.Title)
+		rep := rep
+		go func() {
+			defer wg.Done()
+			fi, err := os.Stat(rep.Name)
+			if err == nil { // no error means it already exists
+				if fi.IsDir() { // if we already have dir, we don't need to clone
+					return
+				} else {
+					errs = append(errs, fmt.Errorf("file %q (for repository %q) already exists and is not a directory", rep.Name, rep.Title))
+					return
+				}
 			}
-		}
-		xc := xe.DefaultConfig()
-		xc.Fatal = false
-		err = xe.Run(xc, "git", "clone", rep.RepositoryURL)
-		if err != nil {
-			return fmt.Errorf("error cloning repository: %w", err)
-		}
+			xc := xe.DefaultConfig()
+			xc.Fatal = false
+			err = xe.Run(xc, "git", "clone", rep.RepositoryURL)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("error cloning repository: %w", err))
+				return
+			}
+		}()
 	}
-	return nil
+	return errors.Join(errs...)
 }
 
 // Repository represents a GoKi Go repository

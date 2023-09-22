@@ -9,7 +9,7 @@ import (
 
 var _ = gti.AddFunc(&gti.Func{
 	Name: "goki.dev/gsm/gsm.Clone",
-	Doc:  "Clone clones all of the GoKi Go repositories into the current directory.\nIt does not clone repositories that the user already has in the current directory.",
+	Doc:  "Clone clones all of the GoKi Go repositories into the current directory.\nIt does not clone repositories that the user already has in the current directory.\n\nIt runs concurrently across multiple goroutines, meaning it should only take\nthe time it takes to clone one repository.",
 	Directives: gti.Directives{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
