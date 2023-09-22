@@ -10,6 +10,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"goki.dev/grease"
@@ -34,8 +35,19 @@ func Changed(c *Config) error {
 			out, err := xe.Output(xe.ErrorConfig(), "git", "-C", dir, "diff")
 			if err != nil {
 				errs = append(errs, fmt.Errorf("error getting diff of %q: %w", dir, err))
+				return
 			}
 			if out != "" { // if we have a diff, we have been changed
+				fmt.Println(grease.CmdColor(dir))
+				return
+			}
+			// if we don't have a diff, we also check to make sure we aren't ahead of the remote
+			out, err = xe.Output(xe.ErrorConfig(), "git", "-C", dir, "status")
+			if err != nil {
+				errs = append(errs, fmt.Errorf("error getting status of %q: %w", dir, err))
+				return
+			}
+			if strings.Contains(out, "Your branch is ahead") { // if we are ahead, we have been changed
 				fmt.Println(grease.CmdColor(dir))
 			}
 		}()
