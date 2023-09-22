@@ -32,7 +32,9 @@ func Changed(c *Config) error {
 				return
 			}
 			dir := filepath.Dir(path)
-			out, err := xe.Output(xe.ErrorConfig(), "git", "-C", dir, "diff")
+			ec := xe.ErrorConfig()
+			ec.Dir = dir
+			out, err := xe.Output(ec, "git", "diff")
 			if err != nil {
 				errs = append(errs, fmt.Errorf("error getting diff of %q: %w", dir, err))
 				return
@@ -42,7 +44,7 @@ func Changed(c *Config) error {
 				return
 			}
 			// if we don't have a diff, we also check to make sure we aren't ahead of the remote
-			out, err = xe.Output(xe.ErrorConfig(), "git", "-C", dir, "status")
+			out, err = xe.Output(ec, "git", "status")
 			if err != nil {
 				errs = append(errs, fmt.Errorf("error getting status of %q: %w", dir, err))
 				return
