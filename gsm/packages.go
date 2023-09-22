@@ -40,6 +40,6 @@ func ParsePackages() ([]*packages.Package, error) {
 // PackageModes returns the package load modes needed for gsm.
 func PackageModes() packages.LoadMode {
 	// TODO: do we need packages.NeedDeps?
-	res := packages.NeedName | packages.NeedImports
+	res := packages.NeedName | packages.NeedImports | packages.NeedModule
 	return res
 }

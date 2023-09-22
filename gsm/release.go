@@ -17,7 +17,9 @@ func Release(c *Config) error {
 		return fmt.Errorf("error parsing packages: %w", err)
 	}
 	for _, pkg := range pkgs {
-		fmt.Println(pkg.Name)
+		if pkg.Module != nil {
+			fmt.Println(pkg.Module.Path, pkg.Imports)
+		}
 	}
 	return nil
 }
