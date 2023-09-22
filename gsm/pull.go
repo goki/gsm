@@ -28,7 +28,7 @@ func Pull(c *Config) error {
 			if d.Name() != ".git" {
 				return
 			}
-			dir := filepath.Base(filepath.Dir(path))
+			dir := filepath.Dir(path)
 			xc := xe.DefaultConfig()
 			xc.Fatal = false
 			err := xe.Run(xc, "git", "-C", dir, "pull")
