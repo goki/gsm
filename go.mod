@@ -8,6 +8,7 @@ require (
 	goki.dev/gti v0.1.0
 	goki.dev/ordmap v0.5.3
 	goki.dev/xe v0.0.0-20230920052752-2a9a798a326d
+	golang.org/x/mod v0.12.0
 	golang.org/x/net v0.15.0
 )
 

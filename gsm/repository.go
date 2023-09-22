@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"sync"
 
+	"golang.org/x/mod/modfile"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -46,11 +47,17 @@ func GetLocalRepositories() ([]*Repository, error) {
 				return
 			}
 			dir := filepath.Dir(path)
-			mod, err := os.ReadFile(path)
+			b, err := os.ReadFile(path)
 			if err != nil {
 				errs = append(errs, fmt.Errorf("error reading mod file for %q: %w", dir, err))
+				return
 			}
-			fmt.Println(string(mod))
+			mod, err := modfile.Parse(path, b, nil)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("error parsing mod file for %q: %w", dir, err))
+				return
+			}
+			fmt.Println(mod.Module)
 		}()
 		return nil
 	})
