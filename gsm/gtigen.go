@@ -22,6 +22,20 @@ var _ = gti.AddFunc(&gti.Func{
 })
 
 var _ = gti.AddFunc(&gti.Func{
+	Name: "goki.dev/gsm/gsm.Clone",
+	Doc:  "Clone concurrently clones all of the GoKi Go repositories into the current directory.\nIt does not clone repositories that the user already has in the current directory.",
+	Directives: gti.Directives{
+		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+	},
+	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+	}),
+	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+	}),
+})
+
+var _ = gti.AddFunc(&gti.Func{
 	Name: "goki.dev/gsm/gsm.Pull",
 	Doc:  "Pull concurrently pulls all of the Git repositories in the current directory.",
 	Directives: gti.Directives{
@@ -36,8 +50,8 @@ var _ = gti.AddFunc(&gti.Func{
 })
 
 var _ = gti.AddFunc(&gti.Func{
-	Name: "goki.dev/gsm/gsm.Clone",
-	Doc:  "Clone concurrently clones all of the GoKi Go repositories into the current directory.\nIt does not clone repositories that the user already has in the current directory.",
+	Name: "goki.dev/gsm/gsm.Release",
+	Doc:  "Release releases all of the GoKi Go repositories in the current folder with goki.dev\nvanity import URLs (those without vanity import URLs should be released separately),\nrecursively updating each one and all of its dependencies, but stopping\nafter a couple of iterations due to pseudo-import cycles at the module level.",
 	Directives: gti.Directives{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
