@@ -26,11 +26,12 @@ func Clone(c *Config) error {
 	}
 	for _, rep := range reps {
 		fi, err := os.Stat(rep.Name)
-		if err == nil && fi.IsDir() { // if we already have dir, we don't need to clone
-			continue
-		}
-		if !fi.IsDir() {
-			return fmt.Errorf("file %q (for repository %q) already exists and is not a directory", rep.Name, rep.Title)
+		if err == nil { // no error means it already exists
+			if fi.IsDir() { // if we already have dir, we don't need to clone
+				continue
+			} else {
+				return fmt.Errorf("file %q (for repository %q) already exists and is not a directory", rep.Name, rep.Title)
+			}
 		}
 		xc := xe.DefaultConfig()
 		xc.Fatal = false
@@ -118,8 +119,8 @@ func extractRepositories(node *html.Node) ([]*Repository, error) {
 			Name:  path.Base(href),
 			Title: a.FirstChild.Data,
 		}
-		rep.RepositoryURL = path.Join("https://github.com/goki/" + rep.Name)
-		rep.VanityURL = path.Join("goki.dev/" + rep.Name)
+		rep.RepositoryURL = "https://github.com/goki/" + rep.Name
+		rep.VanityURL = "goki.dev/" + rep.Name
 		res = append(res, rep)
 	}
 	return res, nil
