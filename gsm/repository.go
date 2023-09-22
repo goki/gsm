@@ -17,11 +17,8 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-// Clone clones all of the GoKi Go repositories into the current directory.
+// Clone concurrently clones all of the GoKi Go repositories into the current directory.
 // It does not clone repositories that the user already has in the current directory.
-//
-// It runs concurrently across multiple goroutines, meaning it should only take
-// the time it takes to clone one repository.
 //
 //gti:add
 func Clone(c *Config) error {
