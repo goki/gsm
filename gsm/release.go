@@ -6,6 +6,7 @@ package gsm
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/Masterminds/semver/v3"
 	"goki.dev/xe"
@@ -75,7 +76,18 @@ func ReleaseRepository(rep *Repository) error {
 	vc := xe.VerboseConfig()
 	vc.Dir = rep.Name
 
-	*rep.Version = rep.Version.IncPatch()
+	if !strings.HasPrefix(rep.Version.Prerelease(), "dev") { // if no dev pre-release, we can just do standard increment
+		*rep.Version = rep.Version.IncPatch()
+	} else { // otherwise, we have to increment pre-release version instead
+		pvn := strings.TrimPrefix(rep.Version.Prerelease(), "dev")
+		pver, err := semver.NewVersion(pvn)
+		if err != nil {
+			return fmt.Errorf("error parsing dev version %q from repository version %q for repository %q: %w", pvn, rep.Version.String(), rep.Name, err)
+		}
+		*pver = pver.IncPatch()
+		// apply incremented pre-release version to main version
+		rep.Version.SetPrerelease("dev" + pver.String())
+	}
 
 	nver := "v" + rep.Version.String()
 	err := xe.Run(vc, "goki", "set-version", nver)
