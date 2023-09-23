@@ -6,6 +6,7 @@ package gsm
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
@@ -23,10 +24,12 @@ func Release(c *Config) error {
 	if err != nil {
 		return fmt.Errorf("error parsing packages: %w", err)
 	}
+	repsm := map[string]*Repository{} // map of repositories
 	for _, rep := range reps {
-		if rep.Name == "gi" || rep.Name == "gi3d" || rep.Name == "gide" || rep.Name == "gipy" || rep.Name == "grid" || rep.Name == "gopix" || rep.Name == "greasi" || rep.Name == "goosi" || rep.Name == "pi" { // TODO: remove this TEMPORARY fix for some repos being a WIP
+		if skipRepo(rep) {
 			continue
 		}
+		repsm[rep.VanityURL] = rep
 		vc := xe.VerboseConfig()
 		vc.Dir = rep.Name
 		err := xe.Run(vc, "go", "get", "-u", "./...")
@@ -65,9 +68,46 @@ func Release(c *Config) error {
 			if err != nil {
 				return err
 			}
+			rep.Released = true
+		}
+	}
+
+	// now that we have done a first pass to get the ones with no GoKi imports,
+	// we check again based on the newly released ones
+	for _, rep := range reps {
+		if skipRepo(rep) {
+			continue
+		}
+		hasGoKiImport := false // whether we still have changed but unreleased GoKi imports
+		for _, imp := range rep.GoKiImports {
+			impr := repsm[imp]
+			if !impr.Changed { // if the import hasn't been changed, we don't need to update it
+				continue
+			}
+			if !impr.Released { // if the import has changed but hasn't been released, we have to wait for them to release first
+				hasGoKiImport = true
+				break
+			}
+			// otherwise, we need to update to the latest release
+			vc := xe.VerboseConfig()
+			vc.Dir = rep.Name
+			err := xe.Run(vc, "go", "get", impr.VanityURL+"@"+impr.Version.String())
+			if err != nil {
+				return fmt.Errorf("error updating GoKi import %q for repository %q: %w", impr.Name, rep.Name, err)
+			}
+		}
+		if hasGoKiImport { // we skip if we still have unreleased GoKi imports
+			continue
 		}
 	}
 	return nil
+}
+
+// skipRepo returns whether to skip the given repository.
+// TODO: remove this TEMPORARY fix for some repos being a WIP
+func skipRepo(rep *Repository) bool {
+	skips := []string{"gi", "gi3d", "gide", "gipy", "grid", "gopix", "greasi", "goosi", "pi", "gosl"}
+	return slices.Contains(skips, rep.Name)
 }
 
 // ReleaseRepository releases the given repository by incrementing its

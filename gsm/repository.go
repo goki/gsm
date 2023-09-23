@@ -37,6 +37,8 @@ type Repository struct {
 	GoKiImports []string
 	// Whether the repository has changed since the last release
 	Changed bool
+	// Whether the repository has been released in the context of this command
+	Released bool
 	// The version of the repository
 	Version *semver.Version
 }
