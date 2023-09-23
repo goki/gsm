@@ -78,6 +78,11 @@ func Release(c *Config) error {
 				continue
 			}
 			hasGoKiImport := false // whether we still have changed but unreleased GoKi imports
+
+			vc := xe.VerboseConfig()
+			vc.Dir = rep.Name
+			vc.Env["GONOSUMDB"] = "*" // don't use sum db to avoid problems (see https://github.com/golang/go/issues/42809)
+
 			for _, imp := range rep.GoKiImports {
 				impr := repsm[imp]
 				if !impr.Changed { // if the import hasn't been changed, we don't need to update it
@@ -88,9 +93,6 @@ func Release(c *Config) error {
 					continue
 				}
 				// otherwise, we need to update to the latest release
-				vc := xe.VerboseConfig()
-				vc.Dir = rep.Name
-				vc.Env["GONOSUMDB"] = "*" // don't use sum db to avoid problems (see https://github.com/golang/go/issues/42809)
 				err := xe.Run(vc, "go", "get", impr.VanityURL+"@v"+impr.Version.String())
 				if err != nil {
 					return fmt.Errorf("error updating GoKi import %q for repository %q: %w", impr.Name, rep.Name, err)
@@ -111,6 +113,10 @@ func Release(c *Config) error {
 				continue
 			}
 			// otherwise, we can release
+			err = xe.Run(vc, "go", "mod", "tidy")
+			if err != nil {
+				return fmt.Errorf("error tidying mod for repository %q: %w", rep.Name, err)
+			}
 			err := ReleaseRepository(rep)
 			if err != nil {
 				return err
