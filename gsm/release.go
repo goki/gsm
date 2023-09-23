@@ -24,7 +24,7 @@ func Release(c *Config) error {
 		return fmt.Errorf("error parsing packages: %w", err)
 	}
 	for _, rep := range reps {
-		if rep.Name == "gi" || rep.Name == "gi3d" || rep.Name == "gide" || rep.Name == "gipy" || rep.Name == "grid" || rep.Name == "gopix" || rep.Name == "greasi" || rep.Name == "goosi" { // TODO: remove this TEMPORARY fix for some repos being a WIP
+		if rep.Name == "gi" || rep.Name == "gi3d" || rep.Name == "gide" || rep.Name == "gipy" || rep.Name == "grid" || rep.Name == "gopix" || rep.Name == "greasi" || rep.Name == "goosi" || rep.Name == "pi" { // TODO: remove this TEMPORARY fix for some repos being a WIP
 			continue
 		}
 		vc := xe.VerboseConfig()
@@ -86,7 +86,11 @@ func ReleaseRepository(rep *Repository) error {
 		}
 		*pver = pver.IncPatch()
 		// apply incremented pre-release version to main version
-		rep.Version.SetPrerelease("dev" + pver.String())
+		nv, err := rep.Version.SetPrerelease("dev" + pver.String())
+		if err != nil {
+			return fmt.Errorf("error setting pre-release of new version to %q from repository version %q for repository %q: %w", "dev"+pver.String(), rep.Version.String(), rep.Name, err)
+		}
+		*rep.Version = nv
 	}
 
 	nver := "v" + rep.Version.String()
