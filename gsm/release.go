@@ -66,49 +66,60 @@ func Release(c *Config) error {
 	}
 
 	// now that we have done a first pass to get the ones with no GoKi imports,
-	// we check again based on the newly released ones
-	for _, rep := range reps {
-		if skipRepo(rep) {
-			continue
-		}
-		if rep.Released { // if we are already released, we skip
-			continue
-		}
-		hasGoKiImport := false // whether we still have changed but unreleased GoKi imports
-		for _, imp := range rep.GoKiImports {
-			impr := repsm[imp]
-			if !impr.Changed { // if the import hasn't been changed, we don't need to update it
-				fmt.Println(imp, "not changed")
+	// we check again based on the newly released ones, until we run out of
+	// repositories to release. we set a backup break point of 10.
+	for i := 0; i < 10; i++ {
+		needRelease := false // whether we still have something that needs to be released but can't be
+		for _, rep := range reps {
+			if skipRepo(rep) {
 				continue
 			}
-			if !impr.Released { // if the import has changed but hasn't been released, we have to wait for them to release first
-				hasGoKiImport = true
-				break
+			if rep.Released { // if we are already released, we skip
+				continue
 			}
-			// otherwise, we need to update to the latest release
-			vc := xe.VerboseConfig()
-			vc.Dir = rep.Name
-			err := xe.Run(vc, "go", "get", impr.VanityURL+"@"+impr.Version.String())
+			hasGoKiImport := false // whether we still have changed but unreleased GoKi imports
+			for _, imp := range rep.GoKiImports {
+				impr := repsm[imp]
+				if !impr.Changed { // if the import hasn't been changed, we don't need to update it
+					continue
+				}
+				if !impr.Released { // if the import has changed but hasn't been released, we have to wait for them to release first
+					hasGoKiImport = true
+					continue
+				}
+				// otherwise, we need to update to the latest release
+				vc := xe.VerboseConfig()
+				vc.Dir = rep.Name
+				vc.Env["GONOSUMDB"] = "*" // don't use sum db to avoid problems (see https://github.com/golang/go/issues/42809)
+				err := xe.Run(vc, "go", "get", impr.VanityURL+"@v"+impr.Version.String())
+				if err != nil {
+					return fmt.Errorf("error updating GoKi import %q for repository %q: %w", impr.Name, rep.Name, err)
+				}
+			}
+			// we skip if we still have unreleased GoKi imports,
+			// unless we are on the second pass and are one of the three
+			// special cyclically importing repositories
+			if hasGoKiImport && !(i == 1 && rep.Name == "enums" || rep.Name == "gti" || rep.Name == "grease") {
+				needRelease = true
+				continue
+			}
+			rep.Changed, err = RepositoryHasChanged(rep, rep.Version.Original())
 			if err != nil {
-				return fmt.Errorf("error updating GoKi import %q for repository %q: %w", impr.Name, rep.Name, err)
+				return err
 			}
+			if !rep.Changed { // we skip if we still haven't changed
+				continue
+			}
+			// otherwise, we can release
+			err := ReleaseRepository(rep)
+			if err != nil {
+				return err
+			}
+			rep.Released = true
 		}
-		if hasGoKiImport { // we skip if we still have unreleased GoKi imports
-			continue
+		if !needRelease {
+			break
 		}
-		rep.Changed, err = RepositoryHasChanged(rep, rep.Version.Original())
-		if err != nil {
-			return err
-		}
-		if !rep.Changed { // we skip if we still haven't changed
-			continue
-		}
-		// otherwise, we can release
-		err := ReleaseRepository(rep)
-		if err != nil {
-			return err
-		}
-		rep.Released = true
 	}
 	return nil
 }
