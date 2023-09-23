@@ -7,8 +7,8 @@ require (
 	github.com/iancoleman/strcase v0.3.0
 	goki.dev/grease v0.8.11
 	goki.dev/gti v0.1.0
-	goki.dev/ordmap v0.5.4
-	goki.dev/xe v0.0.0
+	goki.dev/ordmap v0.5.5
+	goki.dev/xe v0.0.1
 	golang.org/x/mod v0.12.0
 	golang.org/x/net v0.15.0
 )
@@ -20,8 +20,8 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mattn/go-shellwords v1.0.12 // indirect
 	goki.dev/enums v0.9.14 // indirect
-	goki.dev/glop v0.1.1 // indirect
-	goki.dev/grows v0.3.2 // indirect
+	goki.dev/glop v0.1.2 // indirect
+	goki.dev/grows v0.3.3 // indirect
 	goki.dev/laser v0.1.1 // indirect
 	golang.org/x/sys v0.12.0 // indirect
 )

@@ -40,30 +40,23 @@ func Release(c *Config) error {
 		if err != nil {
 			return fmt.Errorf("error tidying mod for repository %q: %w", rep.Name, err)
 		}
-
 		ec := xe.ErrorConfig()
 		ec.Dir = rep.Name
 		tag, err := xe.Output(ec, "git", "describe", "--abbrev=0")
 		if err != nil {
 			return fmt.Errorf("error getting latest tag for repository %q: %w", rep.Name, err)
 		}
-
-		diff, err := xe.Output(ec, "git", "diff", tag)
+		rep.Changed, err = RepositoryHasChanged(rep, tag)
 		if err != nil {
-			return fmt.Errorf("error getting diff from latest tag %q for repository %q: %w", tag, rep.Name, err)
+			return err
 		}
-		rep.Changed = diff != ""
-		if !rep.Changed { // unchanged, so no release needed
-			continue
-		}
-
 		ver, err := semver.NewVersion(tag)
 		if err != nil {
 			return fmt.Errorf("error getting semver version of repository %q from tag %q: %w", rep.Name, tag, err)
 		}
 		rep.Version = ver
 
-		if len(rep.GoKiImports) == 0 { // if we have no GoKi imports, we can release right now
+		if rep.Changed && len(rep.GoKiImports) == 0 { // if we are changed and have no GoKi imports, we can release right now
 			err := ReleaseRepository(rep)
 			if err != nil {
 				return err
@@ -78,10 +71,14 @@ func Release(c *Config) error {
 		if skipRepo(rep) {
 			continue
 		}
+		if rep.Released { // if we are already released, we skip
+			continue
+		}
 		hasGoKiImport := false // whether we still have changed but unreleased GoKi imports
 		for _, imp := range rep.GoKiImports {
 			impr := repsm[imp]
 			if !impr.Changed { // if the import hasn't been changed, we don't need to update it
+				fmt.Println(imp, "not changed")
 				continue
 			}
 			if !impr.Released { // if the import has changed but hasn't been released, we have to wait for them to release first
@@ -99,6 +96,19 @@ func Release(c *Config) error {
 		if hasGoKiImport { // we skip if we still have unreleased GoKi imports
 			continue
 		}
+		rep.Changed, err = RepositoryHasChanged(rep, rep.Version.Original())
+		if err != nil {
+			return err
+		}
+		if !rep.Changed { // we skip if we still haven't changed
+			continue
+		}
+		// otherwise, we can release
+		err := ReleaseRepository(rep)
+		if err != nil {
+			return err
+		}
+		rep.Released = true
 	}
 	return nil
 }
@@ -108,6 +118,19 @@ func Release(c *Config) error {
 func skipRepo(rep *Repository) bool {
 	skips := []string{"gi", "gi3d", "gide", "gipy", "grid", "gopix", "greasi", "goosi", "pi", "gosl"}
 	return slices.Contains(skips, rep.Name)
+}
+
+// RepositoryHasChanged returns whether the given repository
+// has changed since the given Git version tag.
+func RepositoryHasChanged(rep *Repository, tag string) (bool, error) {
+	ec := xe.ErrorConfig()
+	ec.Dir = rep.Name
+
+	diff, err := xe.Output(ec, "git", "diff", tag)
+	if err != nil {
+		return false, fmt.Errorf("error getting diff from latest tag %q for repository %q: %w", tag, rep.Name, err)
+	}
+	return diff != "", nil
 }
 
 // ReleaseRepository releases the given repository by incrementing its
