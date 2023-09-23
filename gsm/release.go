@@ -23,11 +23,18 @@ func Release(c *Config) error {
 		return fmt.Errorf("error parsing packages: %w", err)
 	}
 	for _, rep := range reps {
+		if rep.Name == "gi" || rep.Name == "gi3d" || rep.Name == "gide" || rep.Name == "gipy" || rep.Name == "grid" || rep.Name == "gopix" || rep.Name == "greasi" { // TODO: remove this TEMPORARY fix for some repos being a WIP
+			continue
+		}
 		vc := xe.VerboseConfig()
 		vc.Dir = rep.Name
 		err := xe.Run(vc, "go", "get", "-u", "./...")
 		if err != nil {
 			return fmt.Errorf("error updating deps for repository %q: %w", rep.Name, err)
+		}
+		err = xe.Run(vc, "go", "mod", "tidy")
+		if err != nil {
+			return fmt.Errorf("error tidying mod for repository %q: %w", rep.Name, err)
 		}
 
 		ec := xe.ErrorConfig()
