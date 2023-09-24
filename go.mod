@@ -3,7 +3,6 @@ module goki.dev/gsm
 go 1.21.0
 
 require (
-	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/iancoleman/strcase v0.3.0
 	goki.dev/grease v0.8.15
 	goki.dev/gti v0.1.4

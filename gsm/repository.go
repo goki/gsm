@@ -15,7 +15,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/iancoleman/strcase"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/net/html"
@@ -40,7 +39,7 @@ type Repository struct {
 	// Whether the repository has been released in the context of this command
 	Released bool
 	// The version of the repository
-	Version *semver.Version
+	Version string
 }
 
 // GetLocalRepositories concurrently gets all of the GoKi Go

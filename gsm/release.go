@@ -7,9 +7,7 @@ package gsm
 import (
 	"fmt"
 	"slices"
-	"strings"
 
-	"github.com/Masterminds/semver/v3"
 	"goki.dev/xe"
 )
 
@@ -50,11 +48,7 @@ func Release(c *Config) error {
 		if err != nil {
 			return err
 		}
-		ver, err := semver.NewVersion(tag)
-		if err != nil {
-			return fmt.Errorf("error getting semver version of repository %q from tag %q: %w", rep.Name, tag, err)
-		}
-		rep.Version = ver
+		rep.Version = tag
 
 		if rep.Changed && len(rep.GoKiImports) == 0 { // if we are changed and have no GoKi imports, we can release right now
 			err := ReleaseRepository(rep)
@@ -93,7 +87,7 @@ func Release(c *Config) error {
 					continue
 				}
 				// otherwise, we need to update to the latest release
-				err := xe.Run(vc, "go", "get", impr.VanityURL+"@v"+impr.Version.String())
+				err := xe.Run(vc, "go", "get", impr.VanityURL+"@v"+impr.Version)
 				if err != nil {
 					return fmt.Errorf("error updating GoKi import %q for repository %q: %w", impr.Name, rep.Name, err)
 				}
@@ -105,7 +99,7 @@ func Release(c *Config) error {
 				needRelease = true
 				continue
 			}
-			rep.Changed, err = RepositoryHasChanged(rep, rep.Version.Original())
+			rep.Changed, err = RepositoryHasChanged(rep, rep.Version)
 			if err != nil {
 				return err
 			}
@@ -150,37 +144,19 @@ func RepositoryHasChanged(rep *Repository, tag string) (bool, error) {
 	return diff != "", nil
 }
 
-// ReleaseRepository releases the given repository by incrementing its
-// patch version and calling "goki set-version" and "goki release".
+// ReleaseRepository releases the given repository by calling
+// "goki update-version" and "goki release".
 func ReleaseRepository(rep *Repository) error {
 	vc := xe.VerboseConfig()
 	vc.Dir = rep.Name
 
-	if !strings.HasPrefix(rep.Version.Prerelease(), "dev") { // if no dev pre-release, we can just do standard increment
-		*rep.Version = rep.Version.IncPatch()
-	} else { // otherwise, we have to increment pre-release version instead
-		pvn := strings.TrimPrefix(rep.Version.Prerelease(), "dev")
-		pver, err := semver.NewVersion(pvn)
-		if err != nil {
-			return fmt.Errorf("error parsing dev version %q from repository version %q for repository %q: %w", pvn, rep.Version.String(), rep.Name, err)
-		}
-		*pver = pver.IncPatch()
-		// apply incremented pre-release version to main version
-		nv, err := rep.Version.SetPrerelease("dev" + pver.String())
-		if err != nil {
-			return fmt.Errorf("error setting pre-release of new version to %q from repository version %q for repository %q: %w", "dev"+pver.String(), rep.Version.String(), rep.Name, err)
-		}
-		*rep.Version = nv
-	}
-
-	nver := "v" + rep.Version.String()
-	err := xe.Run(vc, "goki", "set-version", nver)
+	err := xe.Run(vc, "goki", "update-version", rep.Version)
 	if err != nil {
-		return fmt.Errorf("error getting setting version of repository %q to %q: %w", rep.Name, nver, err)
+		return fmt.Errorf("error getting updating version of repository %q: %w", rep.Name, err)
 	}
 	err = xe.Run(vc, "goki", "release")
 	if err != nil {
-		return fmt.Errorf("error releasing repository %q with version %q: %w", rep.Name, nver, err)
+		return fmt.Errorf("error releasing repository %q: %w", rep.Name, err)
 	}
 	return nil
 }
