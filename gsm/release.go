@@ -87,7 +87,7 @@ func Release(c *Config) error {
 					continue
 				}
 				// otherwise, we need to update to the latest release
-				err := xe.Run(vc, "go", "get", impr.VanityURL+"@v"+impr.Version)
+				err := xe.Run(vc, "go", "get", impr.VanityURL+"@"+impr.Version)
 				if err != nil {
 					return fmt.Errorf("error updating GoKi import %q for repository %q: %w", impr.Name, rep.Name, err)
 				}
