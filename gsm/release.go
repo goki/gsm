@@ -150,7 +150,7 @@ func ReleaseRepository(rep *Repository) error {
 	vc := xe.VerboseConfig()
 	vc.Dir = rep.Name
 
-	err := xe.Run(vc, "goki", "update-version", rep.Version)
+	err := xe.Run(vc, "goki", "update-version")
 	if err != nil {
 		return fmt.Errorf("error getting updating version of repository %q: %w", rep.Name, err)
 	}
