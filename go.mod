@@ -5,6 +5,7 @@ go 1.21.0
 require (
 	github.com/iancoleman/strcase v0.3.0
 	goki.dev/grease v0.8.16
+	goki.dev/grog v0.0.0-20230925012547-a930c3343470
 	goki.dev/gti v0.1.5
 	goki.dev/ordmap v0.5.5
 	goki.dev/xe v0.0.2
@@ -24,7 +25,6 @@ require (
 	goki.dev/cam v0.9.16 // indirect
 	goki.dev/enums v0.9.20 // indirect
 	goki.dev/glop v0.1.2 // indirect
-	goki.dev/grog v0.0.0-20230925012547-a930c3343470 // indirect
 	goki.dev/grows v0.3.3 // indirect
 	goki.dev/laser v0.1.6 // indirect
 	goki.dev/mat32/v2 v2.0.0-dev0.0.6 // indirect

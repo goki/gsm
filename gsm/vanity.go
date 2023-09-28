@@ -49,7 +49,7 @@ func NewVanity(c *Config) error {
 	if err != nil {
 		return fmt.Errorf("error writing to _index.md file for vanity URL: %w", err)
 	}
-	err = xe.Run(xe.VerboseConfig(), "git", "add", fname)
+	err = xe.Run("git", "add", fname)
 	if err != nil {
 		return fmt.Errorf("error adding to git: %w", err)
 	}

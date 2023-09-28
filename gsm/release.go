@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"slices"
 
+	"goki.dev/grog"
 	"goki.dev/xe"
 )
 
@@ -28,19 +29,16 @@ func Release(c *Config) error {
 			continue
 		}
 		repsm[rep.VanityURL] = rep
-		vc := xe.VerboseConfig()
-		vc.Dir = rep.Name
-		err := xe.Run(vc, "go", "get", "-u", "./...")
+		xc := xe.Major().SetDir(rep.Name)
+		err := xc.Run("go", "get", "-u", "./...")
 		if err != nil {
 			return fmt.Errorf("error updating deps for repository %q: %w", rep.Name, err)
 		}
-		err = xe.Run(vc, "go", "mod", "tidy")
+		err = xc.Run("go", "mod", "tidy")
 		if err != nil {
 			return fmt.Errorf("error tidying mod for repository %q: %w", rep.Name, err)
 		}
-		ec := xe.ErrorConfig()
-		ec.Dir = rep.Name
-		tag, err := xe.Output(ec, "git", "describe", "--abbrev=0")
+		tag, err := xe.Minor().SetDir(rep.Name).Output("git", "describe", "--abbrev=0")
 		if err != nil {
 			return fmt.Errorf("error getting latest tag for repository %q: %w", rep.Name, err)
 		}
@@ -73,9 +71,8 @@ func Release(c *Config) error {
 			}
 			hasGoKiImport := false // whether we still have changed but unreleased GoKi imports
 
-			vc := xe.VerboseConfig()
-			vc.Dir = rep.Name
-			vc.Env["GONOSUMDB"] = "*" // don't use sum db to avoid problems (see https://github.com/golang/go/issues/42809)
+			// don't use sum db to avoid problems (see https://github.com/golang/go/issues/42809)
+			xc := xe.Major().SetDir(rep.Name).SetEnv("GONOSUMDB", "*")
 
 			for _, imp := range rep.GoKiImports {
 				impr := repsm[imp]
@@ -87,7 +84,7 @@ func Release(c *Config) error {
 					continue
 				}
 				// otherwise, we need to update to the latest release
-				err := xe.Run(vc, "go", "get", impr.VanityURL+"@"+impr.Version)
+				err := xc.Run("go", "get", impr.VanityURL+"@"+impr.Version)
 				if err != nil {
 					return fmt.Errorf("error updating GoKi import %q for repository %q: %w", impr.Name, rep.Name, err)
 				}
@@ -107,7 +104,7 @@ func Release(c *Config) error {
 				continue
 			}
 			// otherwise, we can release
-			err = xe.Run(vc, "go", "mod", "tidy")
+			err = xc.Run("go", "mod", "tidy")
 			if err != nil {
 				return fmt.Errorf("error tidying mod for repository %q: %w", rep.Name, err)
 			}
@@ -134,10 +131,7 @@ func skipRepo(rep *Repository) bool {
 // RepositoryHasChanged returns whether the given repository
 // has changed since the given Git version tag.
 func RepositoryHasChanged(rep *Repository, tag string) (bool, error) {
-	ec := xe.ErrorConfig()
-	ec.Dir = rep.Name
-
-	diff, err := xe.Output(ec, "git", "diff", tag)
+	diff, err := xe.Minor().SetDir(rep.Name).Output("git", "diff", tag)
 	if err != nil {
 		return false, fmt.Errorf("error getting diff from latest tag %q for repository %q: %w", tag, rep.Name, err)
 	}
@@ -147,16 +141,16 @@ func RepositoryHasChanged(rep *Repository, tag string) (bool, error) {
 // ReleaseRepository releases the given repository by calling
 // "goki update-version" and "goki release".
 func ReleaseRepository(rep *Repository) error {
-	vc := xe.VerboseConfig()
-	vc.Dir = rep.Name
+	xc := xe.Major().SetDir(rep.Name)
 
-	err := xe.Run(vc, "goki", "update-version")
+	err := xc.Run("goki", "update-version")
 	if err != nil {
 		return fmt.Errorf("error getting updating version of repository %q: %w", rep.Name, err)
 	}
-	err = xe.Run(vc, "goki", "release")
+	err = xc.Run("goki", "release")
 	if err != nil {
 		return fmt.Errorf("error releasing repository %q: %w", rep.Name, err)
 	}
+	fmt.Println("Released", grog.CmdColor(rep.Name))
 	return nil
 }

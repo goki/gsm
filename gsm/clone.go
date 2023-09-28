@@ -38,7 +38,7 @@ func Clone(c *Config) error {
 					return
 				}
 			}
-			err = xe.Run(xe.VerboseConfig(), "git", "clone", rep.RepositoryURL)
+			err = xe.Run("git", "clone", rep.RepositoryURL)
 			if err != nil {
 				errs = append(errs, fmt.Errorf("error cloning repository: %w", err))
 			}
