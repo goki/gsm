@@ -36,6 +36,20 @@ var _ = gti.AddFunc(&gti.Func{
 })
 
 var _ = gti.AddFunc(&gti.Func{
+	Name: "goki.dev/gsm/gsm.MakeIOSFramework",
+	Doc:  "MakeIOSFramework makes a .framework file for iOS from\na .dylib file, using the given config information.",
+	Directives: gti.Directives{
+		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+	},
+	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+	}),
+	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+	}),
+})
+
+var _ = gti.AddFunc(&gti.Func{
 	Name: "goki.dev/gsm/gsm.Pull",
 	Doc:  "Pull concurrently pulls all of the Git repositories in the current directory.",
 	Directives: gti.Directives{

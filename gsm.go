@@ -13,5 +13,5 @@ import (
 
 func main() {
 	opts := grease.DefaultOptions("gsm", "GSM", "CLI and GUI tools for maintaining the source code of GoKi itself (GoKi Source Management)")
-	grease.Run(opts, &gsm.Config{}, gsm.Clone, gsm.Pull, gsm.Changed, gsm.Release, gsm.NewVanity)
+	grease.Run(opts, &gsm.Config{}, gsm.Clone, gsm.Pull, gsm.Changed, gsm.Release, gsm.NewVanity, gsm.MakeIOSFramework)
 }
