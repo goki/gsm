@@ -43,7 +43,7 @@ func MakeIOSFramework(c *Config) error {
 	if err != nil {
 		return err
 	}
-	err = xe.Run("codesign", "--force", "--dep", "--verbose=2", "--sign", c.IOSFramework.Developer, c.IOSFramework.Framework+".framework")
+	err = xe.Run("codesign", "--force", "--deep", "--verbose=2", "--sign", c.IOSFramework.Developer, c.IOSFramework.Framework+".framework")
 	if err != nil {
 		return err
 	}
