@@ -9,23 +9,23 @@ package gsm
 type Config struct {
 
 	// the name of the repository to create a vanity import site for
-	Repository string `cmd:"new-vanity" posarg:"0" desc:"the name of the repository to create a vanity import site for"`
+	Repository string `cmd:"new-vanity" posarg:"0"`
 
 	// the config info for the make-ios-framework command
-	IOSFramework IOSFramework `cmd:"make-ios-framework" desc:"the config info for the make-ios-framework command"`
+	IOSFramework IOSFramework `cmd:"make-ios-framework"`
 }
 
 type IOSFramework struct {
 
 	// the path of the .dylib file
-	Dylib string `desc:"the path of the .dylib file"`
+	Dylib string
 
 	// the name of the resulting framework
-	Framework string `desc:"the name of the resulting framework"`
+	Framework string
 
 	// the name/email address of the developer to have sign the framework
-	Developer string `desc:"the name/email address of the developer to have sign the framework"`
+	Developer string
 
 	// the organization to use in the bundle id for the resulting framework
-	Organization string `desc:"the organization to use in the bundle id for the resulting framework"`
+	Organization string
 }
