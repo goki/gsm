@@ -7,6 +7,40 @@ import (
 	"goki.dev/ordmap"
 )
 
+var _ = gti.AddType(&gti.Type{
+	Name:      "goki.dev/gsm/gsm.Config",
+	ShortName: "gsm.Config",
+	IDName:    "config",
+	Doc:       "Config contains the configuration information for the GSM tool",
+	Directives: gti.Directives{
+		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+	},
+	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"Repository", &gti.Field{Name: "Repository", Type: "string", Doc: "the name of the repository to create a vanity import site for", Directives: gti.Directives{}}},
+		{"IOSFramework", &gti.Field{Name: "IOSFramework", Type: "IOSFramework", Doc: "the config info for the make-ios-framework command", Directives: gti.Directives{}}},
+	}),
+	Embeds:  ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),
+	Methods: ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
+})
+
+var _ = gti.AddType(&gti.Type{
+	Name:      "goki.dev/gsm/gsm.IOSFramework",
+	ShortName: "gsm.IOSFramework",
+	IDName:    "ios-framework",
+	Doc:       "",
+	Directives: gti.Directives{
+		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+	},
+	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"Dylib", &gti.Field{Name: "Dylib", Type: "string", Doc: "the path of the .dylib file", Directives: gti.Directives{}}},
+		{"Framework", &gti.Field{Name: "Framework", Type: "string", Doc: "the name of the resulting framework", Directives: gti.Directives{}}},
+		{"Developer", &gti.Field{Name: "Developer", Type: "string", Doc: "the name/email address of the developer to have sign the framework", Directives: gti.Directives{}}},
+		{"Organization", &gti.Field{Name: "Organization", Type: "string", Doc: "the organization to use in the bundle id for the resulting framework", Directives: gti.Directives{}}},
+	}),
+	Embeds:  ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),
+	Methods: ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
+})
+
 var _ = gti.AddFunc(&gti.Func{
 	Name: "goki.dev/gsm/gsm.Changed",
 	Doc:  "Changed concurrently prints all of the repositories that have been changed\nand need to be updated in version control.",

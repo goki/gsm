@@ -6,6 +6,8 @@
 package gsm
 
 // Config contains the configuration information for the GSM tool
+//
+//gti:add
 type Config struct {
 
 	// the name of the repository to create a vanity import site for
@@ -15,6 +17,7 @@ type Config struct {
 	IOSFramework IOSFramework `cmd:"make-ios-framework"`
 }
 
+//gti:add
 type IOSFramework struct {
 
 	// the path of the .dylib file
