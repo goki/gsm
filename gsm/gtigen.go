@@ -70,6 +70,20 @@ var _ = gti.AddFunc(&gti.Func{
 })
 
 var _ = gti.AddFunc(&gti.Func{
+	Name: "goki.dev/gsm/gsm.InstallTools",
+	Doc:  "InstallTools installs all of the GoKi tools required for development on\nthe GoKi codebase (goki, gsm, gtigen, and enumgen). It should be run in a\ndirectory containing all of the goki repositories (set up with gsm clone),\nand with a go.work file contianing all of those repositories (set up with gsm work).",
+	Directives: gti.Directives{
+		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+	},
+	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+	}),
+	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+	}),
+})
+
+var _ = gti.AddFunc(&gti.Func{
 	Name: "goki.dev/gsm/gsm.MakeIOSFramework",
 	Doc:  "MakeIOSFramework makes a .framework file for iOS from\na .dylib file, using the given config information.",
 	Directives: gti.Directives{
