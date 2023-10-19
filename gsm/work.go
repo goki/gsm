@@ -38,6 +38,6 @@ func Work(c *Config) error {
 		if dir == "gipy" || dir == "goki.github.io" || dir == "android-go" || strings.Contains(dir, "internal") {
 			return nil
 		}
-		return xe.Run("go", "work", "use")
+		return xe.Run("go", "work", "use", dir)
 	})
 }
