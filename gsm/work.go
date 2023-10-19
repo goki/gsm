@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"goki.dev/glop/dirs"
 	"goki.dev/xe"
@@ -32,6 +33,11 @@ func Work(c *Config) error {
 		if d.Name() != "go.mod" {
 			return nil
 		}
-		return xe.Run("go", "work", "use", filepath.Dir(path))
+		dir := filepath.Dir(path)
+		// TODO: figure out a more sustainable solution to this temporary workaround
+		if dir == "gipy" || dir == "goki.github.io" || dir == "android-go" || strings.Contains(dir, "internal") {
+			return nil
+		}
+		return xe.Run("go", "work", "use")
 	})
 }
