@@ -153,7 +153,7 @@ func Release(c *Config) error {
 // skipRepo returns whether to skip the given repository.
 // TODO(kai): remove this TEMPORARY fix for some repos being a WIP
 func skipRepo(rep *Repository) bool {
-	skips := []string{"gi3d", "gide", "gipy", "grid", "gopix", "greasi", "gosl", "gear"}
+	skips := []string{"gi3d", "gide", "gipy", "grid", "gopix", "gosl", "gear"}
 	return slices.Contains(skips, rep.Name)
 }
 
