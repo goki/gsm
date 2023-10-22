@@ -29,8 +29,14 @@ func Release(c *Config) error {
 			continue
 		}
 		repsm[rep.VanityURL] = rep
+		// if we have GoKi imports, we need to update them first, so we skip
+		if len(rep.GoKiImports) > 0 {
+			continue
+		}
+
 		// don't use sum db to avoid problems (see https://github.com/golang/go/issues/42809)
 		xc := xe.Major().SetDir(rep.Name).SetEnv("GONOSUMDB", "*")
+
 		err := xc.Run("go", "get", "-u", "./...")
 		if err != nil {
 			return fmt.Errorf("error updating deps for repository %q: %w", rep.Name, err)
@@ -43,13 +49,13 @@ func Release(c *Config) error {
 		if err != nil {
 			return fmt.Errorf("error getting latest tag for repository %q: %w", rep.Name, err)
 		}
+		rep.Version = tag
 		rep.Changed, err = RepositoryHasChanged(rep, tag)
 		if err != nil {
 			return err
 		}
-		rep.Version = tag
 
-		if rep.Changed && len(rep.GoKiImports) == 0 { // if we are changed and have no GoKi imports, we can release right now
+		if rep.Changed { // if we are changed and have no GoKi imports, we can release right now
 			err := ReleaseRepository(rep)
 			if err != nil {
 				return err
@@ -97,19 +103,33 @@ func Release(c *Config) error {
 				needRelease = true
 				continue
 			}
-			rep.Changed, err = RepositoryHasChanged(rep, rep.Version)
+
+			// now we make sure we have the latest versions of everything
+			err := xc.Run("go", "get", "-u", "./...")
 			if err != nil {
-				return err
+				return fmt.Errorf("error updating deps for repository %q: %w", rep.Name, err)
 			}
-			if !rep.Changed { // we skip if we still haven't changed
-				continue
-			}
-			// otherwise, we can release
 			err = xc.Run("go", "mod", "tidy")
 			if err != nil {
 				return fmt.Errorf("error tidying mod for repository %q: %w", rep.Name, err)
 			}
-			err := ReleaseRepository(rep)
+			tag, err := xe.Minor().SetDir(rep.Name).Output("git", "describe", "--abbrev=0")
+			if err != nil {
+				return fmt.Errorf("error getting latest tag for repository %q: %w", rep.Name, err)
+			}
+			rep.Version = tag
+
+			// we skip if we still haven't changed
+			rep.Changed, err = RepositoryHasChanged(rep, rep.Version)
+			if err != nil {
+				return err
+			}
+			if !rep.Changed {
+				continue
+			}
+
+			// otherwise, we can release
+			err = ReleaseRepository(rep)
 			if err != nil {
 				return err
 			}
