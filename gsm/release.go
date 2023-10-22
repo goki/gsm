@@ -29,7 +29,8 @@ func Release(c *Config) error {
 			continue
 		}
 		repsm[rep.VanityURL] = rep
-		xc := xe.Major().SetDir(rep.Name)
+		// don't use sum db to avoid problems (see https://github.com/golang/go/issues/42809)
+		xc := xe.Major().SetDir(rep.Name).SetEnv("GONOSUMDB", "*")
 		err := xc.Run("go", "get", "-u", "./...")
 		if err != nil {
 			return fmt.Errorf("error updating deps for repository %q: %w", rep.Name, err)
