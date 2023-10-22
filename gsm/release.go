@@ -176,6 +176,11 @@ func ReleaseRepository(rep *Repository) error {
 	if err != nil {
 		return fmt.Errorf("error getting updating version of repository %q: %w", rep.Name, err)
 	}
+	nv, err := xc.Output("goki", "get-version")
+	if err != nil {
+		return fmt.Errorf("error getting new version of repository %q: %w", rep.Name, err)
+	}
+	rep.Version = nv
 	err = xc.Run("goki", "release")
 	if err != nil {
 		return fmt.Errorf("error releasing repository %q: %w", rep.Name, err)
