@@ -7,6 +7,7 @@ package gsm
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"goki.dev/grog"
 	"goki.dev/xe"
@@ -180,7 +181,8 @@ func ReleaseRepository(rep *Repository) error {
 	if err != nil {
 		return fmt.Errorf("error getting new version of repository %q: %w", rep.Name, err)
 	}
-	rep.Version = nv
+	// we only want the part before the newline (the version)
+	rep.Version, _, _ = strings.Cut(nv, "\n")
 	err = xc.Run("goki", "release")
 	if err != nil {
 		return fmt.Errorf("error releasing repository %q: %w", rep.Name, err)
