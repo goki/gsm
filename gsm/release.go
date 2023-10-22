@@ -57,6 +57,12 @@ func Release(c *Config) error {
 			return fmt.Errorf("error tidying mod for repository %q: %w", rep.Name, err)
 		}
 
+		// check again if we are changed after updating deps and mod
+		rep.Changed, err = RepositoryHasChanged(rep, tag)
+		if err != nil {
+			return err
+		}
+
 		if rep.Changed { // if we are changed and have no GoKi imports, we can release right now
 			err := ReleaseRepository(rep)
 			if err != nil {
