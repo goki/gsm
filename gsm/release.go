@@ -29,22 +29,7 @@ func Release(c *Config) error {
 			continue
 		}
 		repsm[rep.VanityURL] = rep
-		// if we have GoKi imports, we need to update them first, so we skip
-		if len(rep.GoKiImports) > 0 {
-			continue
-		}
 
-		// don't use sum db to avoid problems (see https://github.com/golang/go/issues/42809)
-		xc := xe.Major().SetDir(rep.Name).SetEnv("GONOSUMDB", "*")
-
-		err := xc.Run("go", "get", "-u", "./...")
-		if err != nil {
-			return fmt.Errorf("error updating deps for repository %q: %w", rep.Name, err)
-		}
-		err = xc.Run("go", "mod", "tidy")
-		if err != nil {
-			return fmt.Errorf("error tidying mod for repository %q: %w", rep.Name, err)
-		}
 		tag, err := xe.Minor().SetDir(rep.Name).Output("git", "describe", "--abbrev=0")
 		if err != nil {
 			return fmt.Errorf("error getting latest tag for repository %q: %w", rep.Name, err)
@@ -53,6 +38,23 @@ func Release(c *Config) error {
 		rep.Changed, err = RepositoryHasChanged(rep, tag)
 		if err != nil {
 			return err
+		}
+
+		// if we have GoKi imports, we need to update them first, so we skip
+		if len(rep.GoKiImports) > 0 {
+			continue
+		}
+
+		// don't use sum db to avoid problems (see https://github.com/golang/go/issues/42809)
+		xc := xe.Major().SetDir(rep.Name).SetEnv("GONOSUMDB", "*")
+
+		err = xc.Run("go", "get", "-u", "./...")
+		if err != nil {
+			return fmt.Errorf("error updating deps for repository %q: %w", rep.Name, err)
+		}
+		err = xc.Run("go", "mod", "tidy")
+		if err != nil {
+			return fmt.Errorf("error tidying mod for repository %q: %w", rep.Name, err)
 		}
 
 		if rep.Changed { // if we are changed and have no GoKi imports, we can release right now
@@ -99,7 +101,7 @@ func Release(c *Config) error {
 			// we skip if we still have unreleased GoKi imports,
 			// unless we are on the second pass and are one of the three
 			// special cyclically importing repositories
-			if hasGoKiImport && !(i == 1 && rep.Name == "enums" || rep.Name == "gti" || rep.Name == "grease") {
+			if hasGoKiImport && !(i == 1 && (rep.Name == "enums" || rep.Name == "gti" || rep.Name == "grease")) {
 				needRelease = true
 				continue
 			}
