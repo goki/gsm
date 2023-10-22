@@ -152,6 +152,6 @@ func ReleaseRepository(rep *Repository) error {
 	if err != nil {
 		return fmt.Errorf("error releasing repository %q: %w", rep.Name, err)
 	}
-	grog.PrintlnWarn(grog.SuccessColor("Released"), grog.CmdColor(rep.Name))
+	grog.PrintlnWarn(grog.SuccessColor("Released "), grog.CmdColor(rep.Name))
 	return nil
 }
