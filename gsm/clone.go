@@ -15,9 +15,7 @@ import (
 
 // Clone concurrently clones all of the GoKi Go repositories into the current directory.
 // It does not clone repositories that the user already has in the current directory.
-//
-//gti:add
-func Clone(c *Config) error {
+func Clone(c *Config) error { //gti:add
 	reps, err := GetWebsiteRepositories()
 	if err != nil {
 		return fmt.Errorf("error getting repositories: %w", err)

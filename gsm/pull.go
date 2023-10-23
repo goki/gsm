@@ -16,9 +16,7 @@ import (
 )
 
 // Pull concurrently pulls all of the Git repositories in the current directory.
-//
-//gti:add
-func Pull(c *Config) error {
+func Pull(c *Config) error { //gti:add
 	wg := sync.WaitGroup{}
 	errs := []error{}
 	fs.WalkDir(os.DirFS("."), ".", func(path string, d fs.DirEntry, err error) error {

@@ -16,9 +16,7 @@ import (
 
 // Work adds all of the Go modules in the current directory to the go.work
 // file in the current directory.
-//
-//gti:add
-func Work(c *Config) error {
+func Work(c *Config) error { //gti:add
 	ex, err := dirs.FileExists("go.work")
 	if err != nil {
 		return err

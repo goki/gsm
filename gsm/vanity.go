@@ -31,9 +31,7 @@ packages: ["goki.dev/{{.Name}}"]
 // NewVanity makes a new vanity import URL page for the config
 // repository name. It should only be called in the root directory
 // of the goki.github.io repository.
-//
-//gti:add
-func NewVanity(c *Config) error {
+func NewVanity(c *Config) error { //gti:add
 	b := bytes.Buffer{}
 	err := newVanityTmpl.Execute(&b, newVanityTmplData{Name: c.Repository, Title: strcase.ToCamel(c.Repository)})
 	if err != nil {

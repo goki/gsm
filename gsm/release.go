@@ -17,9 +17,7 @@ import (
 // vanity import URLs (those without vanity import URLs should be released separately),
 // recursively updating each one and all of its dependencies, but stopping
 // after a couple of iterations due to pseudo-import cycles at the module level.
-//
-//gti:add
-func Release(c *Config) error {
+func Release(c *Config) error { //gti:add
 	reps, err := GetLocalRepositories()
 	if err != nil {
 		return fmt.Errorf("error parsing packages: %w", err)

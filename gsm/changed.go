@@ -19,9 +19,7 @@ import (
 
 // Changed concurrently prints all of the repositories that have been changed
 // and need to be updated in version control.
-//
-//gti:add
-func Changed(c *Config) error {
+func Changed(c *Config) error { //gti:add
 	wg := sync.WaitGroup{}
 	errs := []error{}
 	fs.WalkDir(os.DirFS("."), ".", func(path string, d fs.DirEntry, err error) error {

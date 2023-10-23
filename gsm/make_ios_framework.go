@@ -14,9 +14,7 @@ import (
 
 // MakeIOSFramework makes a .framework file for iOS from
 // a .dylib file, using the given config information.
-//
-//gti:add
-func MakeIOSFramework(c *Config) error {
+func MakeIOSFramework(c *Config) error { //gti:add
 	// based on https://stackoverflow.com/a/57795040
 	err := xe.Run("install_name_tool", "-id", "@executable_path/"+c.IOSFramework.Framework+".framework/"+c.IOSFramework.Framework, c.IOSFramework.Dylib)
 	if err != nil {

@@ -14,9 +14,7 @@ import (
 // the GoKi codebase (goki, gsm, gtigen, and enumgen). It should be run in a
 // directory containing all of the goki repositories (set up with gsm clone),
 // and with a go.work file contianing all of those repositories (set up with gsm work).
-//
-//gti:add
-func InstallTools(c *Config) error {
+func InstallTools(c *Config) error { //gti:add
 	paths := []string{
 		"goki",
 		"gsm",
