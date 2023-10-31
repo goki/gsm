@@ -1,6 +1,6 @@
 Name = "gsm"
 Desc = ""
-Version = "v0.0.9"
+Version = "v0.0.10"
 Type = "App"
 
 [Build]
@@ -35,7 +35,6 @@ Type = "App"
 [Generate]
   Dir = "."
   Output = "gokigen.go"
-  AddKiTypes = false
   [Generate.Enumgen]
     Dir = "."
     Output = "enumgen.go"
@@ -57,3 +56,4 @@ Type = "App"
     AddFuncs = false
     Instance = false
     TypeVar = false
+    Setters = false
