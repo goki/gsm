@@ -16,8 +16,8 @@ var _ = gti.AddType(&gti.Type{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"Repository", &gti.Field{Name: "Repository", Type: "string", Doc: "the name of the repository to create a vanity import site for", Directives: gti.Directives{}}},
-		{"IOSFramework", &gti.Field{Name: "IOSFramework", Type: "IOSFramework", Doc: "the config info for the make-ios-framework command", Directives: gti.Directives{}}},
+		{"Repository", &gti.Field{Name: "Repository", Type: "string", LocalType: "string", Doc: "the name of the repository to create a vanity import site for", Directives: gti.Directives{}, Tag: "cmd:\"new-vanity\" posarg:\"0\""}},
+		{"IOSFramework", &gti.Field{Name: "IOSFramework", Type: "goki.dev/gsm/gsm.IOSFramework", LocalType: "IOSFramework", Doc: "the config info for the make-ios-framework command", Directives: gti.Directives{}, Tag: "cmd:\"make-ios-framework\""}},
 	}),
 	Embeds:  ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),
 	Methods: ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
@@ -32,10 +32,10 @@ var _ = gti.AddType(&gti.Type{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"Dylib", &gti.Field{Name: "Dylib", Type: "string", Doc: "the path of the .dylib file", Directives: gti.Directives{}}},
-		{"Framework", &gti.Field{Name: "Framework", Type: "string", Doc: "the name of the resulting framework", Directives: gti.Directives{}}},
-		{"Developer", &gti.Field{Name: "Developer", Type: "string", Doc: "the name/email address of the developer to have sign the framework", Directives: gti.Directives{}}},
-		{"Organization", &gti.Field{Name: "Organization", Type: "string", Doc: "the organization to use in the bundle id for the resulting framework", Directives: gti.Directives{}}},
+		{"Dylib", &gti.Field{Name: "Dylib", Type: "string", LocalType: "string", Doc: "the path of the .dylib file", Directives: gti.Directives{}, Tag: ""}},
+		{"Framework", &gti.Field{Name: "Framework", Type: "string", LocalType: "string", Doc: "the name of the resulting framework", Directives: gti.Directives{}, Tag: ""}},
+		{"Developer", &gti.Field{Name: "Developer", Type: "string", LocalType: "string", Doc: "the name/email address of the developer to have sign the framework", Directives: gti.Directives{}, Tag: ""}},
+		{"Organization", &gti.Field{Name: "Organization", Type: "string", LocalType: "string", Doc: "the organization to use in the bundle id for the resulting framework", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Embeds:  ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),
 	Methods: ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
@@ -48,10 +48,10 @@ var _ = gti.AddFunc(&gti.Func{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+		{"c", &gti.Field{Name: "c", Type: "*goki.dev/gsm/gsm.Config", LocalType: "*Config", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+		{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 })
 
@@ -62,10 +62,24 @@ var _ = gti.AddFunc(&gti.Func{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+		{"c", &gti.Field{Name: "c", Type: "*goki.dev/gsm/gsm.Config", LocalType: "*Config", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+		{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+	}),
+})
+
+var _ = gti.AddFunc(&gti.Func{
+	Name: "goki.dev/gsm/gsm.Gendex",
+	Doc:  "Gendex runs goki.dev/goki/mobile/gendex.go and install-tools.\nIt should be run in the base goki directory whenever\ngoki.dev/goosi/driver/android/GoNativeActivty.java is updated.",
+	Directives: gti.Directives{
+		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+	},
+	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"c", &gti.Field{Name: "c", Type: "*goki.dev/gsm/gsm.Config", LocalType: "*Config", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+	}),
+	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 })
 
@@ -76,10 +90,10 @@ var _ = gti.AddFunc(&gti.Func{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+		{"c", &gti.Field{Name: "c", Type: "*goki.dev/gsm/gsm.Config", LocalType: "*Config", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+		{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 })
 
@@ -90,10 +104,10 @@ var _ = gti.AddFunc(&gti.Func{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+		{"c", &gti.Field{Name: "c", Type: "*goki.dev/gsm/gsm.Config", LocalType: "*Config", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+		{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 })
 
@@ -104,10 +118,10 @@ var _ = gti.AddFunc(&gti.Func{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+		{"c", &gti.Field{Name: "c", Type: "*goki.dev/gsm/gsm.Config", LocalType: "*Config", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+		{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 })
 
@@ -118,10 +132,10 @@ var _ = gti.AddFunc(&gti.Func{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+		{"c", &gti.Field{Name: "c", Type: "*goki.dev/gsm/gsm.Config", LocalType: "*Config", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+		{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 })
 
@@ -132,10 +146,10 @@ var _ = gti.AddFunc(&gti.Func{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+		{"c", &gti.Field{Name: "c", Type: "*goki.dev/gsm/gsm.Config", LocalType: "*Config", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+		{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 })
 
@@ -146,9 +160,9 @@ var _ = gti.AddFunc(&gti.Func{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"c", &gti.Field{Name: "c", Type: "*Config", Doc: "", Directives: gti.Directives{}}},
+		{"c", &gti.Field{Name: "c", Type: "*goki.dev/gsm/gsm.Config", LocalType: "*Config", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"error", &gti.Field{Name: "error", Type: "error", Doc: "", Directives: gti.Directives{}}},
+		{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 })
