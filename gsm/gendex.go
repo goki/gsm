@@ -14,7 +14,7 @@ import (
 // It should be run in the base goki directory whenever
 // goki.dev/goosi/driver/android/GoNativeActivty.java is updated.
 func Gendex(c *Config) error { //gti:add
-	err := xe.Major().SetDir(filepath.Join("goki", "mobile")).Run("go run gendex.go")
+	err := xe.Major().SetDir(filepath.Join("goki", "mobile")).Run("go", "generate")
 	if err != nil {
 		return err
 	}
