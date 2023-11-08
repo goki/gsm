@@ -5,12 +5,12 @@ go 1.21.0
 require (
 	github.com/iancoleman/strcase v0.3.0
 	goki.dev/glop v0.1.4
-	goki.dev/grease v0.8.26
-	goki.dev/grog v0.0.11
-	goki.dev/gti v0.1.13
+	goki.dev/grease v0.8.27
+	goki.dev/grog v0.0.12
+	goki.dev/gti v0.1.15
 	goki.dev/ordmap v0.5.6
-	goki.dev/xe v0.0.11
-	golang.org/x/mod v0.13.0
+	goki.dev/xe v0.0.13
+	golang.org/x/mod v0.14.0
 	golang.org/x/net v0.17.0
 )
 
@@ -24,13 +24,13 @@ require (
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
-	goki.dev/cam v0.9.33 // indirect
-	goki.dev/colors v0.8.27 // indirect
-	goki.dev/enums v0.9.36 // indirect
-	goki.dev/grows v0.3.13 // indirect
-	goki.dev/laser v0.1.15 // indirect
-	goki.dev/mat32/v2 v2.0.0-dev0.0.10 // indirect
-	golang.org/x/image v0.13.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	goki.dev/cam v0.9.34 // indirect
+	goki.dev/colors v0.8.28 // indirect
+	goki.dev/enums v0.9.37 // indirect
+	goki.dev/grows v0.3.14 // indirect
+	goki.dev/laser v0.1.17 // indirect
+	goki.dev/mat32/v2 v2.0.0-dev0.0.12 // indirect
+	golang.org/x/image v0.14.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 )
