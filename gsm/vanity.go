@@ -21,11 +21,11 @@ type newVanityTmplData struct {
 }
 
 var newVanityTmpl = template.Must(template.New("newVanity").Parse(
-	`---
-title: {{.Title}}
-repo: "https://github.com/goki/{{.Name}}"
-packages: ["goki.dev/{{.Name}}"]
----
+	`+++
+title = {{.Title}}
+repo = 'https://github.com/goki/{{.Name}}'
+packages = ['goki.dev/{{.Name}}']
++++
 `))
 
 // NewVanity makes a new vanity import URL page for the config
