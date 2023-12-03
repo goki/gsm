@@ -90,6 +90,9 @@ func Release(c *Config) error { //gti:add
 
 			for _, imp := range rep.GoKiImports {
 				impr := repsm[imp]
+				if impr == nil {
+					return fmt.Errorf("missing repository for import %q; ", imp)
+				}
 				if !impr.Changed { // if the import hasn't been changed, we don't need to update it
 					continue
 				}
