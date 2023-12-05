@@ -32,7 +32,7 @@ packages = ['goki.dev/{{.Name}}']
 
 // NewVanity makes a new vanity import URL page for the config
 // repository name. It should only be called in the root directory
-// of the goki.github.io repository.
+// of the goki.github.io repository. It commits and pushes the page.
 func NewVanity(c *Config) error { //gti:add
 	b := bytes.Buffer{}
 	d := newVanityTmplData{Name: c.Repository, RepoName: c.Repository, Title: strcase.ToCamel(c.Repository)}
@@ -60,5 +60,9 @@ func NewVanity(c *Config) error { //gti:add
 	if err != nil {
 		return fmt.Errorf("error adding to git: %w", err)
 	}
-	return nil
+	err = xe.Run("git", "commit", "-am", "added "+d.Title)
+	if err != nil {
+		return err
+	}
+	return xe.Run("git", "push")
 }

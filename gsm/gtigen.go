@@ -141,7 +141,7 @@ var _ = gti.AddFunc(&gti.Func{
 
 var _ = gti.AddFunc(&gti.Func{
 	Name: "goki.dev/gsm/gsm.NewVanity",
-	Doc:  "NewVanity makes a new vanity import URL page for the config\nrepository name. It should only be called in the root directory\nof the goki.github.io repository.",
+	Doc:  "NewVanity makes a new vanity import URL page for the config\nrepository name. It should only be called in the root directory\nof the goki.github.io repository. It commits and pushes the page.",
 	Directives: gti.Directives{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
