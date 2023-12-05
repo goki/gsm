@@ -60,7 +60,7 @@ func NewVanity(c *Config) error { //gti:add
 	if err != nil {
 		return fmt.Errorf("error adding to git: %w", err)
 	}
-	err = xe.Run("git", "commit", "-am", "added "+d.Title)
+	err = xe.Run("git", "commit", "-am", "added "+c.Repository)
 	if err != nil {
 		return err
 	}
