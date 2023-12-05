@@ -16,7 +16,7 @@ var _ = gti.AddType(&gti.Type{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"Repository", &gti.Field{Name: "Repository", Type: "string", LocalType: "string", Doc: "the name of the repository to create a vanity import site for", Directives: gti.Directives{}, Tag: "cmd:\"new-vanity\" posarg:\"0\""}},
+		{"Repository", &gti.Field{Name: "Repository", Type: "string", LocalType: "string", Doc: "The name of the repository to create a vanity import site for.\nA major version suffix can be added to the end of the repository name\n(eg: \"gi/v2\")", Directives: gti.Directives{}, Tag: "cmd:\"new-vanity\" posarg:\"0\""}},
 		{"IOSFramework", &gti.Field{Name: "IOSFramework", Type: "goki.dev/gsm/gsm.IOSFramework", LocalType: "IOSFramework", Doc: "the config info for the make-ios-framework command", Directives: gti.Directives{}, Tag: "cmd:\"make-ios-framework\""}},
 	}),
 	Embeds:  ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),

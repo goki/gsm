@@ -8,7 +8,9 @@ package gsm
 // Config contains the configuration information for the GSM tool
 type Config struct { //gti:add
 
-	// the name of the repository to create a vanity import site for
+	// The name of the repository to create a vanity import site for.
+	// A major version suffix can be added to the end of the repository name
+	// (eg: "gi/v2")
 	Repository string `cmd:"new-vanity" posarg:"0"`
 
 	// the config info for the make-ios-framework command

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/iancoleman/strcase"
@@ -16,14 +17,15 @@ import (
 )
 
 type newVanityTmplData struct {
-	Name  string
-	Title string
+	Name     string
+	RepoName string
+	Title    string
 }
 
 var newVanityTmpl = template.Must(template.New("newVanity").Parse(
 	`+++
 title = '{{.Title}}'
-repo = 'https://github.com/goki/{{.Name}}'
+repo = 'https://github.com/goki/{{.RepoName}}'
 packages = ['goki.dev/{{.Name}}']
 +++
 `))
@@ -33,7 +35,14 @@ packages = ['goki.dev/{{.Name}}']
 // of the goki.github.io repository.
 func NewVanity(c *Config) error { //gti:add
 	b := bytes.Buffer{}
-	err := newVanityTmpl.Execute(&b, newVanityTmplData{Name: c.Repository, Title: strcase.ToCamel(c.Repository)})
+	d := newVanityTmplData{Name: c.Repository, RepoName: c.Repository, Title: strcase.ToCamel(c.Repository)}
+	// we cut any later parts of the repository name (major version suffixes,
+	// submodules, etc), but leave them in the module name
+	if before, _, has := strings.Cut(c.Repository, "/"); has {
+		d.RepoName = before
+		d.Title = strcase.ToCamel(d.RepoName)
+	}
+	err := newVanityTmpl.Execute(&b, d)
 	if err != nil {
 		return fmt.Errorf("programmer error: error executing vanity URL file template: %w", err)
 	}
