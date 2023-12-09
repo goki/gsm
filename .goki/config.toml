@@ -1,6 +1,6 @@
 Name = "gsm"
 Desc = ""
-Version = "v0.0.18"
+Version = "v0.0.19"
 Type = "App"
 
 [Build]
