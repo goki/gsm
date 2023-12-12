@@ -15,8 +15,9 @@ import (
 
 // Release releases all of the GoKi Go repositories in the current folder with goki.dev
 // vanity import URLs (those without vanity import URLs should be released separately),
-// recursively updating each one and all of its dependencies, but stopping
-// after a couple of iterations due to pseudo-import cycles at the module level.
+// recursively updating each one and all of its dependencies (if the update flag is
+// on, which it is by default), but stopping after a couple of iterations due to
+// pseudo-import cycles at the module level.
 func Release(c *Config) error { //gti:add
 	reps, err := GetLocalRepositories()
 	if err != nil {

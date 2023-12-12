@@ -128,7 +128,7 @@ var _ = gti.AddFunc(&gti.Func{
 
 var _ = gti.AddFunc(&gti.Func{
 	Name: "goki.dev/gsm/gsm.Release",
-	Doc:  "Release releases all of the GoKi Go repositories in the current folder with goki.dev\nvanity import URLs (those without vanity import URLs should be released separately),\nrecursively updating each one and all of its dependencies, but stopping\nafter a couple of iterations due to pseudo-import cycles at the module level.",
+	Doc:  "Release releases all of the GoKi Go repositories in the current folder with goki.dev\nvanity import URLs (those without vanity import URLs should be released separately),\nrecursively updating each one and all of its dependencies (if the update flag is\non, which it is by default), but stopping after a couple of iterations due to\npseudo-import cycles at the module level.",
 	Directives: gti.Directives{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
