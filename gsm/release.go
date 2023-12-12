@@ -24,13 +24,27 @@ func Release(c *Config) error { //gti:add
 		return fmt.Errorf("error parsing packages: %w", err)
 	}
 
-	// if we don't need to update, we can just simply release each repository
+	// if we don't need to update, we can just simply release each changed repository
 	if !c.Update {
 		for _, rep := range reps {
 			if skipRepo(rep) {
 				continue
 			}
-			err := ReleaseRepository(rep)
+
+			tag, err := xe.Minor().SetDir(rep.Name).Output("git", "describe", "--abbrev=0")
+			if err != nil {
+				return fmt.Errorf("error getting latest tag for repository %q: %w", rep.Name, err)
+			}
+			rep.Version = tag
+			rep.Changed, err = RepositoryHasChanged(rep, tag)
+			if err != nil {
+				return err
+			}
+			if !rep.Changed {
+				continue
+			}
+
+			err = ReleaseRepository(rep)
 			if err != nil {
 				return err
 			}
