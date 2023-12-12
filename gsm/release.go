@@ -22,6 +22,18 @@ func Release(c *Config) error { //gti:add
 	if err != nil {
 		return fmt.Errorf("error parsing packages: %w", err)
 	}
+
+	// if we don't need to update, we can just simply release each repository
+	if !c.Update {
+		for _, rep := range reps {
+			err := ReleaseRepository(rep)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
 	repsm := map[string]*Repository{} // map of repositories
 	for _, rep := range reps {
 		if skipRepo(rep) {

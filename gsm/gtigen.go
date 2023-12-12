@@ -16,6 +16,7 @@ var _ = gti.AddType(&gti.Type{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"Update", &gti.Field{Name: "Update", Type: "bool", LocalType: "bool", Doc: "Update is whether to update dependencies and tidy modules\nwhen doing a release cycle. It should only be turned off\nin rare cases in which updating dependencies or tidying\nmodules would cause problems or is not possible.", Directives: gti.Directives{}, Tag: "cmd:\"release\" def:\"true\""}},
 		{"Repository", &gti.Field{Name: "Repository", Type: "string", LocalType: "string", Doc: "The name of the repository to create a vanity import site for.\nA major version suffix can be added to the end of the repository name\n(eg: \"gi/v2\")", Directives: gti.Directives{}, Tag: "cmd:\"new-vanity\" posarg:\"0\""}},
 		{"IOSFramework", &gti.Field{Name: "IOSFramework", Type: "goki.dev/gsm/gsm.IOSFramework", LocalType: "IOSFramework", Doc: "the config info for the make-ios-framework command", Directives: gti.Directives{}, Tag: "cmd:\"make-ios-framework\""}},
 	}),
