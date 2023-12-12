@@ -26,6 +26,9 @@ func Release(c *Config) error { //gti:add
 	// if we don't need to update, we can just simply release each repository
 	if !c.Update {
 		for _, rep := range reps {
+			if skipRepo(rep) {
+				continue
+			}
 			err := ReleaseRepository(rep)
 			if err != nil {
 				return err
