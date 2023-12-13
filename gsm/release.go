@@ -5,7 +5,10 @@
 package gsm
 
 import (
+	"bytes"
 	"fmt"
+	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -204,7 +207,23 @@ func RepositoryHasChanged(rep *Repository, tag string) (bool, error) {
 func ReleaseRepository(rep *Repository) error {
 	xc := xe.Major().SetDir(rep.Name)
 
-	err := xc.Run("goki", "update-version")
+	mf := filepath.Join(rep.Name, "go.mod")
+	mod, err := os.ReadFile(mf)
+	if err != nil {
+		return err
+	}
+	mod = bytes.ReplaceAll(mod,
+		[]byte(`go 1.21.0
+
+	toolchain go1.21.4`),
+		[]byte(`go 1.21`),
+	)
+	err = os.WriteFile(mf, mod, 0666)
+	if err != nil {
+		return err
+	}
+
+	err = xc.Run("goki", "update-version")
 	if err != nil {
 		return fmt.Errorf("error getting updating version of repository %q: %w", rep.Name, err)
 	}
