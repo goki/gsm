@@ -213,10 +213,8 @@ func ReleaseRepository(rep *Repository) error {
 		return err
 	}
 	mod = bytes.ReplaceAll(mod,
-		[]byte(`go 1.21.0
-
-	toolchain go1.21.4`),
-		[]byte(`go 1.21`),
+		[]byte("go 1.21.0\n\ntoolchain go1.21.4"),
+		[]byte("go 1.21"),
 	)
 	err = os.WriteFile(mf, mod, 0666)
 	if err != nil {
