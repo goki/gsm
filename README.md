@@ -1,2 +1,2 @@
 # gsm
-CLI and GUI tools for maintaining the source code of GoKi itself (GoKi Source Management)
+CLI and GUI tools for maintaining the source code of Goki itself (Goki Source Management)

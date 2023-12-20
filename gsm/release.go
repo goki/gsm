@@ -1,4 +1,4 @@
-// Copyright (c) 2023, The GoKi Authors. All rights reserved.
+// Copyright (c) 2023, The Goki Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,7 +16,7 @@ import (
 	"goki.dev/xe"
 )
 
-// Release releases all of the GoKi Go repositories in the current folder with goki.dev
+// Release releases all of the Goki Go repositories in the current folder with goki.dev
 // vanity import URLs (those without vanity import URLs should be released separately),
 // recursively updating each one and all of its dependencies (if the update flag is
 // on, which it is by default), but stopping after a couple of iterations due to
@@ -72,8 +72,8 @@ func Release(c *Config) error { //gti:add
 			return err
 		}
 
-		// if we have GoKi imports, we need to update them first, so we skip
-		if len(rep.GoKiImports) > 0 {
+		// if we have Goki imports, we need to update them first, so we skip
+		if len(rep.GokiImports) > 0 {
 			continue
 		}
 
@@ -95,7 +95,7 @@ func Release(c *Config) error { //gti:add
 			return err
 		}
 
-		if rep.Changed { // if we are changed and have no GoKi imports, we can release right now
+		if rep.Changed { // if we are changed and have no Goki imports, we can release right now
 			err := ReleaseRepository(rep)
 			if err != nil {
 				return err
@@ -104,7 +104,7 @@ func Release(c *Config) error { //gti:add
 		}
 	}
 
-	// now that we have done a first pass to get the ones with no GoKi imports,
+	// now that we have done a first pass to get the ones with no Goki imports,
 	// we check again based on the newly released ones, until we run out of
 	// repositories to release. we set a backup break point of 10.
 	for i := 0; i < 10; i++ {
@@ -116,12 +116,12 @@ func Release(c *Config) error { //gti:add
 			if rep.Released { // if we are already released, we skip
 				continue
 			}
-			hasGoKiImport := false // whether we still have changed but unreleased GoKi imports
+			hasGokiImport := false // whether we still have changed but unreleased Goki imports
 
 			// don't use sum db to avoid problems (see https://github.com/golang/go/issues/42809)
 			xc := xe.Major().SetDir(rep.Name).SetEnv("GONOSUMDB", "*")
 
-			for _, imp := range rep.GoKiImports {
+			for _, imp := range rep.GokiImports {
 				impr := repsm[imp]
 				if impr == nil {
 					return fmt.Errorf("missing repository for import %q; you might need to run gsm clone", imp)
@@ -130,19 +130,19 @@ func Release(c *Config) error { //gti:add
 					continue
 				}
 				if !impr.Released { // if the import has changed but hasn't been released, we have to wait for them to release first
-					hasGoKiImport = true
+					hasGokiImport = true
 					continue
 				}
 				// otherwise, we need to update to the latest release
 				err := xc.Run("go", "get", impr.VanityURL+"@"+impr.Version)
 				if err != nil {
-					return fmt.Errorf("error updating GoKi import %q for repository %q: %w", impr.Name, rep.Name, err)
+					return fmt.Errorf("error updating Goki import %q for repository %q: %w", impr.Name, rep.Name, err)
 				}
 			}
-			// we skip if we still have unreleased GoKi imports,
+			// we skip if we still have unreleased Goki imports,
 			// unless we are on the second pass and are one of the three
 			// special cyclically importing repositories
-			if hasGoKiImport && !(i == 1 && (rep.Name == "enums" || rep.Name == "gti" || rep.Name == "grease")) {
+			if hasGokiImport && !(i == 1 && (rep.Name == "enums" || rep.Name == "gti" || rep.Name == "grease")) {
 				needRelease = true
 				continue
 			}
@@ -188,7 +188,7 @@ func Release(c *Config) error { //gti:add
 // skipRepo returns whether to skip the given repository.
 // TODO(kai): remove this TEMPORARY fix for some repos being a WIP
 func skipRepo(rep *Repository) bool {
-	skips := []string{"gipy", "grid", "gopix", "gosl", "goki.github.io", "rqlite", "gorqlite"}
+	skips := []string{"gipy", "grid", "gopix", "goki.github.io", "rqlite", "gorqlite"}
 	return slices.Contains(skips, rep.Name)
 }
 

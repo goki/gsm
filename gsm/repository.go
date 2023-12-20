@@ -1,4 +1,4 @@
-// Copyright (c) 2023, The GoKi Authors. All rights reserved.
+// Copyright (c) 2023, The Goki Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -21,7 +21,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-// Repository represents a GoKi Go repository. Not all fields
+// Repository represents a Goki Go repository. Not all fields
 // are used by all use cases.
 type Repository struct {
 	// The actual GitHub name of the repository
@@ -32,8 +32,8 @@ type Repository struct {
 	RepositoryURL string
 	// The goki.dev vanity import URL of the repository (not including https://)
 	VanityURL string
-	// The GoKi imports of the repository
-	GoKiImports []string
+	// The Goki imports of the repository
+	GokiImports []string
 	// Whether the repository has changed since the last release
 	Changed bool
 	// Whether the repository has been released in the context of this command
@@ -42,7 +42,7 @@ type Repository struct {
 	Version string
 }
 
-// GetLocalRepositories concurrently gets all of the GoKi Go
+// GetLocalRepositories concurrently gets all of the Goki Go
 // repositories with goki.dev vanity import URLs in the current
 // directory on the local filesystem.
 func GetLocalRepositories() ([]*Repository, error) {
@@ -83,7 +83,7 @@ func GetLocalRepositories() ([]*Repository, error) {
 				if !strings.HasPrefix(req.Mod.Path, "goki.dev") {
 					continue
 				}
-				rep.GoKiImports = append(rep.GoKiImports, req.Mod.Path)
+				rep.GokiImports = append(rep.GokiImports, req.Mod.Path)
 			}
 			res = append(res, rep)
 		}()
@@ -93,7 +93,7 @@ func GetLocalRepositories() ([]*Repository, error) {
 	return res, errors.Join(errs...)
 }
 
-// GetWebsiteRepositories gets all of the GoKi Go repositories as [Repository]
+// GetWebsiteRepositories gets all of the Goki Go repositories as [Repository]
 // objects from the https://goki.dev/repositories page.
 func GetWebsiteRepositories() ([]*Repository, error) {
 	resp, err := http.Get("https://goki.dev/repositories")
