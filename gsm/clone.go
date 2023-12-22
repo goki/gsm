@@ -1,4 +1,4 @@
-// Copyright (c) 2023, The GoKi Authors. All rights reserved.
+// Copyright (c) 2023, The Goki Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -13,7 +13,7 @@ import (
 	"goki.dev/xe"
 )
 
-// Clone concurrently clones all of the GoKi Go repositories into the current directory.
+// Clone concurrently clones all of the Goki Go repositories into the current directory.
 // It does not clone repositories that the user already has in the current directory.
 func Clone(c *Config) error { //gti:add
 	reps, err := GetWebsiteRepositories()

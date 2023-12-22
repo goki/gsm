@@ -58,7 +58,7 @@ var _ = gti.AddFunc(&gti.Func{
 
 var _ = gti.AddFunc(&gti.Func{
 	Name: "goki.dev/gsm/gsm.Clone",
-	Doc:  "Clone concurrently clones all of the GoKi Go repositories into the current directory.\nIt does not clone repositories that the user already has in the current directory.",
+	Doc:  "Clone concurrently clones all of the Goki Go repositories into the current directory.\nIt does not clone repositories that the user already has in the current directory.",
 	Directives: gti.Directives{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
@@ -86,7 +86,7 @@ var _ = gti.AddFunc(&gti.Func{
 
 var _ = gti.AddFunc(&gti.Func{
 	Name: "goki.dev/gsm/gsm.InstallTools",
-	Doc:  "InstallTools installs all of the GoKi tools required for development on\nthe GoKi codebase (goki, gsm, gtigen, and enumgen). It should be run in a\ndirectory containing all of the goki repositories (set up with gsm clone),\nand with a go.work file contianing all of those repositories (set up with gsm work).",
+	Doc:  "InstallTools installs all of the Goki tools required for development on\nthe Goki codebase (goki, gsm, gtigen, and enumgen). It should be run in a\ndirectory containing all of the goki repositories (set up with gsm clone),\nand with a go.work file contianing all of those repositories (set up with gsm work).",
 	Directives: gti.Directives{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
@@ -128,7 +128,7 @@ var _ = gti.AddFunc(&gti.Func{
 
 var _ = gti.AddFunc(&gti.Func{
 	Name: "goki.dev/gsm/gsm.Release",
-	Doc:  "Release releases all of the GoKi Go repositories in the current folder with goki.dev\nvanity import URLs (those without vanity import URLs should be released separately),\nrecursively updating each one and all of its dependencies (if the update flag is\non, which it is by default), but stopping after a couple of iterations due to\npseudo-import cycles at the module level.",
+	Doc:  "Release releases all of the Goki Go repositories in the current folder with goki.dev\nvanity import URLs (those without vanity import URLs should be released separately),\nrecursively updating each one and all of its dependencies (if the update flag is\non, which it is by default), but stopping after a couple of iterations due to\npseudo-import cycles at the module level.",
 	Directives: gti.Directives{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},

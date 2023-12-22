@@ -1,8 +1,8 @@
-// Copyright (c) 2023, The GoKi Authors. All rights reserved.
+// Copyright (c) 2023, The Goki Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package gsm provides functions for maintaining the source code of GoKi itself (GoKi Source Management)
+// Package gsm provides functions for maintaining the source code of Goki itself (Goki Source Management)
 package gsm
 
 // Config contains the configuration information for the GSM tool
