@@ -61,10 +61,8 @@ func Release(c *Config) error { //gti:add
 
 		tag, err := xe.Minor().SetDir(rep.Name).Output("git", "describe", "--abbrev=0")
 		if err != nil {
-			if !strings.Contains(tag, "No names found") {
-				return fmt.Errorf("error getting latest tag for repository %q: %w", rep.Name, err)
-			}
-			// if we have no versions already, we need to do an initial release
+			// if we have an error getting the latest version, we probably
+			// have no released version, so we need to do an initial release
 			err := ReleaseRepository(rep)
 			if err != nil {
 				return err
