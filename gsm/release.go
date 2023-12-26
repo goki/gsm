@@ -67,6 +67,7 @@ func Release(c *Config) error { //gti:add
 			if err != nil {
 				return err
 			}
+			tag = rep.Version
 		}
 		rep.Version = tag
 		rep.Changed, err = RepositoryHasChanged(rep, tag)
