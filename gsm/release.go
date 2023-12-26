@@ -6,6 +6,7 @@ package gsm
 
 import (
 	"fmt"
+	"log/slog"
 	"slices"
 	"strings"
 
@@ -63,6 +64,7 @@ func Release(c *Config) error { //gti:add
 		if err != nil {
 			// if we have an error getting the latest version, we probably
 			// have no released version, so we need to do an initial release
+			slog.Warn("no latest version found for repository; doing initial release", "repository", rep.Name)
 			err := ReleaseRepository(rep)
 			if err != nil {
 				return err
