@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package gsm provides functions for maintaining the source code of Goki itself (Goki Source Management)
-package gsm
+package cmd
 
 // Config contains the configuration information for the GSM tool
 type Config struct { //gti:add

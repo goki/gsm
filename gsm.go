@@ -4,14 +4,12 @@
 
 package main
 
-//go:generate goki generate ./...
-
 import (
 	"goki.dev/grease"
-	"goki.dev/gsm/gsm"
+	"goki.dev/gsm/cmd"
 )
 
 func main() {
 	opts := grease.DefaultOptions("gsm", "GSM", "CLI and GUI tools for maintaining the source code of Goki itself (Goki Source Management)")
-	grease.Run(opts, &gsm.Config{}, gsm.Clone, gsm.Pull, gsm.Changed, gsm.Release, gsm.Work, gsm.InstallTools, gsm.Gendex, gsm.NewVanity, gsm.MakeIOSFramework)
+	grease.Run(opts, &cmd.Config{}, cmd.Clone, cmd.Pull, cmd.Changed, cmd.Release, cmd.Work, cmd.InstallTools, cmd.Gendex, cmd.NewVanity, cmd.MakeIOSFramework)
 }
